@@ -1,4 +1,4 @@
-import { PrismaClient, UserRole, CompanyStatus, UserStatus } from '@prisma/client'
+import { PrismaClient, UserRole, CompanyStatus } from '@prisma/client'
 import bcrypt from 'bcryptjs'
 
 const prisma = new PrismaClient()
@@ -23,11 +23,11 @@ async function main() {
   const superadmin = await prisma.user.create({
     data: {
       email: 'superadmin@watercrm.com',
-      passwordHash: hashedPassword,
+      password: hashedPassword,
       firstName: 'Super',
       lastName: 'Admin',
       role: UserRole.SUPERADMIN,
-      status: UserStatus.ACTIVE,
+      isActive: true,
       forcePasswordChange: false,
       company: {
         create: {
@@ -66,11 +66,11 @@ async function main() {
   const admin = await prisma.user.create({
     data: {
       email: 'admin@aguaspuras.com',
-      passwordHash: adminPassword,
+      password: adminPassword,
       firstName: 'Juan',
       lastName: 'García',
       role: UserRole.ADMIN,
-      status: UserStatus.ACTIVE,
+      isActive: true,
       forcePasswordChange: true,
       companyId: demoCompany.id,
     }
@@ -85,11 +85,11 @@ async function main() {
   const directorSales = await prisma.user.create({
     data: {
       email: 'director.comercial@aguaspuras.com',
-      passwordHash: directorPassword,
+      password: directorPassword,
       firstName: 'María',
       lastName: 'López',
       role: UserRole.DIRECTOR_SALES,
-      status: UserStatus.ACTIVE,
+      isActive: true,
       forcePasswordChange: true,
       companyId: demoCompany.id,
     }
@@ -102,11 +102,11 @@ async function main() {
   const commercial1 = await prisma.user.create({
     data: {
       email: 'comercial1@aguaspuras.com',
-      passwordHash: await bcrypt.hash('Comercial123!', 10),
+      password: await bcrypt.hash('Comercial123!', 10),
       firstName: 'Pedro',
       lastName: 'Martínez',
       role: UserRole.SALES,
-      status: UserStatus.ACTIVE,
+      isActive: true,
       forcePasswordChange: true,
       companyId: demoCompany.id,
     }
@@ -115,11 +115,11 @@ async function main() {
   const commercial2 = await prisma.user.create({
     data: {
       email: 'comercial2@aguaspuras.com',
-      passwordHash: await bcrypt.hash('Comercial123!', 10),
+      password: await bcrypt.hash('Comercial123!', 10),
       firstName: 'Ana',
       lastName: 'Rodríguez',
       role: UserRole.SALES,
-      status: UserStatus.ACTIVE,
+      isActive: true,
       forcePasswordChange: true,
       companyId: demoCompany.id,
     }
@@ -147,11 +147,11 @@ async function main() {
   const directorTech = await prisma.user.create({
     data: {
       email: 'director.instalaciones@aguaspuras.com',
-      passwordHash: await bcrypt.hash('Director123!', 10),
+      password: await bcrypt.hash('Director123!', 10),
       firstName: 'Carlos',
       lastName: 'Sánchez',
       role: UserRole.DIRECTOR_INSTALLATIONS,
-      status: UserStatus.ACTIVE,
+      isActive: true,
       forcePasswordChange: true,
       companyId: demoCompany.id,
     }
@@ -161,11 +161,11 @@ async function main() {
   const technician = await prisma.user.create({
     data: {
       email: 'instalador1@aguaspuras.com',
-      passwordHash: await bcrypt.hash('Tecnico123!', 10),
+      password: await bcrypt.hash('Tecnico123!', 10),
       firstName: 'Luis',
       lastName: 'Fernández',
       role: UserRole.TECHNICIAN,
-      status: UserStatus.ACTIVE,
+      isActive: true,
       forcePasswordChange: true,
       companyId: demoCompany.id,
     }
@@ -186,11 +186,11 @@ async function main() {
   const marketing = await prisma.user.create({
     data: {
       email: 'marketing@aguaspuras.com',
-      passwordHash: await bcrypt.hash('Marketing123!', 10),
+      password: await bcrypt.hash('Marketing123!', 10),
       firstName: 'Laura',
       lastName: 'Pérez',
       role: UserRole.MARKETING,
-      status: UserStatus.ACTIVE,
+      isActive: true,
       forcePasswordChange: true,
       companyId: demoCompany.id,
     }
@@ -202,11 +202,11 @@ async function main() {
   const warehouse = await prisma.user.create({
     data: {
       email: 'almacen@aguaspuras.com',
-      passwordHash: await bcrypt.hash('Almacen123!', 10),
+      password: await bcrypt.hash('Almacen123!', 10),
       firstName: 'Jorge',
       lastName: 'Torres',
       role: UserRole.WAREHOUSE,
-      status: UserStatus.ACTIVE,
+      isActive: true,
       forcePasswordChange: true,
       companyId: demoCompany.id,
     }

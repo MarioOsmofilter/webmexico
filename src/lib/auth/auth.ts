@@ -4,7 +4,7 @@ import CredentialsProvider from "next-auth/providers/credentials"
 import bcrypt from "bcryptjs"
 import { PrismaAdapter } from "@auth/prisma-adapter"
 import prisma from "@/lib/prisma/client"
-import { UserRole, UserStatus } from "@prisma/client"
+import { UserRole } from "@prisma/client"
 
 export const authConfig: NextAuthConfig = {
   adapter: PrismaAdapter(prisma),
@@ -43,14 +43,14 @@ export const authConfig: NextAuthConfig = {
         }
 
         // Verificar estado del usuario
-        if (user.status !== UserStatus.ACTIVE) {
+        if (!user.isActive) {
           throw new Error("Usuario inactivo o suspendido")
         }
 
         // Verificar contraseña
         const isPasswordValid = await bcrypt.compare(
           credentials.password as string,
-          user.passwordHash
+          user.password
         )
 
         if (!isPasswordValid) {

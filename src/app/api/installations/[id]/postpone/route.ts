@@ -30,7 +30,7 @@ export async function POST(
     }
 
     // Verificar que el usuario es el asignado
-    if (installation.assignedTo !== session.user.id) {
+    if (installation.assignedToUserId !== session.user.id) {
       return NextResponse.json(
         { error: "No estás asignado a esta instalación" },
         { status: 403 }

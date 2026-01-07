@@ -3,7 +3,7 @@
  * Ejecutar con: npx tsx prisma/test-db.ts
  */
 
-import { PrismaClient, UserRole, CompanyStatus, UserStatus, ProductStatus, LeadStatus } from '@prisma/client'
+import { PrismaClient, UserRole, CompanyStatus, ProductStatus, LeadStatus } from '@prisma/client'
 import bcrypt from 'bcryptjs'
 
 const prisma = new PrismaClient()
@@ -34,11 +34,11 @@ async function testDatabase() {
     const director = await prisma.user.create({
       data: {
         email: 'test.director@test.com',
-        passwordHash: await bcrypt.hash('Test123!', 10),
+        password: await bcrypt.hash('Test123!', 10),
         firstName: 'Director',
         lastName: 'Test',
         role: UserRole.DIRECTOR_SALES,
-        status: UserStatus.ACTIVE,
+        isActive: true,
         companyId: testCompany.id,
       }
     })
@@ -46,11 +46,11 @@ async function testDatabase() {
     const comercial = await prisma.user.create({
       data: {
         email: 'test.comercial@test.com',
-        passwordHash: await bcrypt.hash('Test123!', 10),
+        password: await bcrypt.hash('Test123!', 10),
         firstName: 'Comercial',
         lastName: 'Test',
         role: UserRole.SALES,
-        status: UserStatus.ACTIVE,
+        isActive: true,
         companyId: testCompany.id,
       }
     })
@@ -198,8 +198,10 @@ async function testDatabase() {
       data: {
         companyId: testCompany.id,
         name: 'Test Warehouse',
-        location: 'Test Location',
-        warehouseType: 'CENTRAL',
+        address: 'Test Address 123',
+        city: 'Test City',
+        state: 'Test State',
+        postalCode: '28001',
       }
     })
 
