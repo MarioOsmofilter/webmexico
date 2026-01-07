@@ -1,0 +1,1733 @@
+// Water CRM - Prisma Schema
+// Base de datos PostgreSQL
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// 1. USUARIOS, EMPRESAS Y AUTENTICACIÓN
+// ============================================
+
+enum UserRole {
+  SUPERADMIN
+  ADMIN
+  DIRECTOR_SALES
+  DIRECTOR_INSTALLATIONS
+  DIRECTOR_MARKETING
+  SALES
+  TECHNICIAN
+  MARKETING
+  WAREHOUSE
+  CUSTOM
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+enum CompanyStatus {
+  ACTIVE
+  INACTIVE
+  TRIAL
+  SUSPENDED
+}
+
+model Company {
+  id          String        @id @default(cuid())
+  name        String
+  slug        String        @unique
+  subdomain   String?       @unique
+  logo        String?
+  status      CompanyStatus @default(TRIAL)
+  settings    Json?         @db.JsonB
+
+  // Superadmin que creó la empresa
+  superadminId String?
+
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  // Relaciones
+  users                 User[]
+  roles                 Role[]
+  products              Product[]
+  productCategories     ProductCategory[]
+  leads                 Lead[]
+  clients               Client[]
+  proposals             Proposal[]
+  proposalTemplates     ProposalTemplate[]
+  sales                 Sale[]
+  salesGoals            SalesGoal[]
+  salesPointsConfig     SalesPointsConfig[]
+  installations         Installation[]
+  maintenances          Maintenance[]
+  incidents             Incident[]
+  warehouses            Warehouse[]
+  inventoryMovements    InventoryMovement[]
+  loadingOrders         LoadingOrder[]
+  wallets               Wallet[]
+  calendarEvents        CalendarEvent[]
+  routes                Route[]
+  tmkCampaigns          TmkCampaign[]
+  tmkCalls              TmkCall[]
+  tmkScripts            TmkScript[]
+  internalMessages      InternalMessage[]
+  expenses              Expense[]
+  companySettings       CompanySetting[]
+  activityLogs          ActivityLog[]
+  apiKeys               ApiKey[]
+
+  @@index([slug])
+  @@index([subdomain])
+  @@map("companies")
+}
+
+model User {
+  id                  String      @id @default(cuid())
+  email               String      @unique
+  passwordHash        String
+  firstName           String
+  lastName            String
+  phone               String?
+  avatar              String?
+
+  companyId           String
+  company             Company     @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  role                UserRole    @default(CUSTOM)
+  status              UserStatus  @default(ACTIVE)
+
+  // Forzar cambio de contraseña en primer login
+  forcePasswordChange Boolean     @default(false)
+
+  createdAt           DateTime    @default(now())
+  updatedAt           DateTime    @updatedAt
+  lastLogin           DateTime?
+
+  // Relaciones
+  permissions         UserPermission[]
+  supervisedBy        UserHierarchy[] @relation("Subordinate")
+  supervises          UserHierarchy[] @relation("Supervisor")
+
+  assignedLeads       Lead[]
+  assignedClients     Client[]
+  createdProposals    Proposal[]
+  approvedProposals   Proposal[]       @relation("ApprovedBy")
+  createdSales        Sale[]
+  salesGoals          SalesGoal[]
+
+  installations       Installation[]
+  maintenances        Maintenance[]
+  reportedIncidents   Incident[]       @relation("ReportedBy")
+  assignedIncidents   Incident[]       @relation("AssignedTo")
+
+  wallet              Wallet?
+  walletTransactions  WalletTransaction[]
+
+  calendarEvents      CalendarEvent[]
+  routes              Route[]
+
+  tmkCalls            TmkCall[]
+
+  sentMessages        InternalMessage[] @relation("Sender")
+  receivedMessages    InternalMessage[] @relation("Recipient")
+
+  expenses            Expense[]
+
+  activityLogs        ActivityLog[]
+
+  loadingOrders       LoadingOrder[]
+
+  @@index([companyId])
+  @@index([email])
+  @@index([role])
+  @@map("users")
+}
+
+model Role {
+  id          String   @id @default(cuid())
+  companyId   String
+  company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  name        String
+  permissions Json     @db.JsonB // Permisos en formato JSON
+  isDefault   Boolean  @default(false)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([companyId, name])
+  @@map("roles")
+}
+
+model UserPermission {
+  id                  String  @id @default(cuid())
+  userId              String
+  user                User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  module              String  // dashboard, leads, clients, products, etc.
+
+  canView             Boolean @default(false)
+  canCreate           Boolean @default(false)
+  canEdit             Boolean @default(false)
+  canDelete           Boolean @default(false)
+
+  canViewSubordinates Boolean @default(false)
+  canViewAll          Boolean @default(false)
+
+  @@unique([userId, module])
+  @@map("user_permissions")
+}
+
+model UserHierarchy {
+  id           String   @id @default(cuid())
+
+  userId       String
+  user         User     @relation("Subordinate", fields: [userId], references: [id], onDelete: Cascade)
+
+  supervisorId String
+  supervisor   User     @relation("Supervisor", fields: [supervisorId], references: [id], onDelete: Cascade)
+
+  companyId    String
+
+  createdAt    DateTime @default(now())
+
+  @@unique([userId, supervisorId])
+  @@index([userId])
+  @@index([supervisorId])
+  @@map("user_hierarchies")
+}
+
+// ============================================
+// 2. PRODUCTOS
+// ============================================
+
+model ProductCategory {
+  id          String    @id @default(cuid())
+  companyId   String?
+  company     Company?  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  name        String
+  parentId    String?
+  parent      ProductCategory?  @relation("SubCategories", fields: [parentId], references: [id])
+  children    ProductCategory[] @relation("SubCategories")
+
+  order       Int       @default(0)
+
+  products    Product[]
+
+  createdAt   DateTime  @default(now())
+
+  @@index([companyId])
+  @@map("product_categories")
+}
+
+enum ProductStatus {
+  ACTIVE
+  INACTIVE
+  DISCONTINUED
+}
+
+model Product {
+  id                    String         @id @default(cuid())
+  companyId             String?
+  company               Company?       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  name                  String
+  description           String?        @db.Text
+  internalReference     String?
+  manufacturerReference String?
+
+  categoryId            String?
+  category              ProductCategory? @relation(fields: [categoryId], references: [id])
+
+  basePrice             Decimal        @default(0) @db.Decimal(10, 2)
+  status                ProductStatus  @default(ACTIVE)
+
+  // Producto maestro del superadmin (si es null, es de una empresa)
+  isMaster              Boolean        @default(false)
+
+  createdBy             String?
+
+  createdAt             DateTime       @default(now())
+  updatedAt             DateTime       @updatedAt
+
+  // Relaciones
+  attributes            ProductAttributeValue[]
+  images                ProductImage[]
+  prices                ProductPrice?
+  datasheets            ProductDatasheet[]
+
+  proposalItems         ProposalItem[]
+  saleItems             SaleItem[]
+
+  installationMaterials InstallationMaterial[]
+  maintenanceMaterials  MaintenanceMaterial[]
+
+  inventory             Inventory[]
+  inventoryMovements    InventoryMovement[]
+  loadingOrderItems     LoadingOrderItem[]
+
+  salesPointsConfig     SalesPointsConfig[]
+
+  @@index([companyId])
+  @@index([isMaster])
+  @@map("products")
+}
+
+enum AttributeType {
+  TEXT
+  NUMBER
+  SELECT
+  BOOLEAN
+  TEXTAREA
+}
+
+model ProductAttribute {
+  id          String        @id @default(cuid())
+  name        String
+  type        AttributeType @default(TEXT)
+  options     Json?         @db.JsonB // Para tipo SELECT
+
+  // Null si es atributo global del superadmin
+  companyId   String?
+
+  createdAt   DateTime      @default(now())
+
+  values      ProductAttributeValue[]
+
+  @@map("product_attributes")
+}
+
+model ProductAttributeValue {
+  id          String           @id @default(cuid())
+
+  productId   String
+  product     Product          @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  attributeId String
+  attribute   ProductAttribute @relation(fields: [attributeId], references: [id], onDelete: Cascade)
+
+  value       String           @db.Text
+
+  @@unique([productId, attributeId])
+  @@map("product_attribute_values")
+}
+
+model ProductImage {
+  id          String   @id @default(cuid())
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  url         String
+  isPrimary   Boolean  @default(false)
+  order       Int      @default(0)
+
+  createdAt   DateTime @default(now())
+
+  @@index([productId])
+  @@map("product_images")
+}
+
+model ProductPrice {
+  id              String   @id @default(cuid())
+  productId       String   @unique
+  product         Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  // Precios de venta por plazos
+  salePrice1      Decimal? @db.Decimal(10, 2)
+  salePrice12     Decimal? @db.Decimal(10, 2)
+  salePrice24     Decimal? @db.Decimal(10, 2)
+  salePrice36     Decimal? @db.Decimal(10, 2)
+  salePrice48     Decimal? @db.Decimal(10, 2)
+  salePrice60     Decimal? @db.Decimal(10, 2)
+
+  // Precios de alquiler por plazos
+  rentalPrice1    Decimal? @db.Decimal(10, 2)
+  rentalPrice12   Decimal? @db.Decimal(10, 2)
+  rentalPrice24   Decimal? @db.Decimal(10, 2)
+  rentalPrice36   Decimal? @db.Decimal(10, 2)
+  rentalPrice48   Decimal? @db.Decimal(10, 2)
+  rentalPrice60   Decimal? @db.Decimal(10, 2)
+
+  // Precio mínimo sin aprobación del director
+  minPriceThreshold Decimal? @db.Decimal(10, 2)
+
+  updatedAt       DateTime @updatedAt
+
+  @@map("product_prices")
+}
+
+enum Language {
+  ES
+  EN
+}
+
+model ProductDatasheet {
+  id          String   @id @default(cuid())
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  language    Language @default(ES)
+  pdfUrl      String?
+  htmlContent String?  @db.Text
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([productId, language])
+  @@map("product_datasheets")
+}
+
+// ============================================
+// 3. LEADS Y CLIENTES
+// ============================================
+
+enum ContactType {
+  INDIVIDUAL
+  BUSINESS
+}
+
+enum LeadSource {
+  WEB
+  TELEMARKETING
+  MANUAL
+  REFERRAL
+  OTHER
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  PROPOSAL_SENT
+  NEGOTIATION
+  CONVERTED
+  LOST
+}
+
+model Lead {
+  id                String      @id @default(cuid())
+  companyId         String
+  company           Company     @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  source            LeadSource  @default(MANUAL)
+  contactType       ContactType @default(INDIVIDUAL)
+
+  // Datos de contacto principal
+  contactName       String
+  email             String?
+  phone             String
+
+  // Datos de empresa (si es BUSINESS)
+  businessName      String?
+  businessContact   String?
+  businessEmail     String?
+  businessPhone     String?
+
+  // Ubicación
+  address           String?
+  city              String?
+  postalCode        String?
+  latitude          Decimal?    @db.Decimal(10, 8)
+  longitude         Decimal?    @db.Decimal(11, 8)
+
+  // Asignación
+  assignedToUserId  String?
+  assignedTo        User?       @relation(fields: [assignedToUserId], references: [id])
+
+  status            LeadStatus  @default(NEW)
+
+  // Observaciones
+  notes             String?     @db.Text
+
+  // Control de actividad
+  createdBy         String?
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+  lastContactDate   DateTime?
+
+  // Días sin acción (calculado)
+  daysWithoutAction Int         @default(0)
+
+  // Relaciones
+  timeline          ContactTimeline[]
+  proposals         Proposal[]
+  client            Client?
+
+  calendarEvents    CalendarEvent[]
+  routeStops        RouteStop[]
+
+  tmkCallListItems  TmkCallListItem[]
+  tmkCalls          TmkCall[]
+
+  @@index([companyId])
+  @@index([assignedToUserId])
+  @@index([status])
+  @@index([source])
+  @@map("leads")
+}
+
+enum ClientStatus {
+  ACTIVE
+  INACTIVE
+  VIP
+}
+
+model Client {
+  id              String       @id @default(cuid())
+  companyId       String
+  company         Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  // Relación con lead original
+  leadId          String?      @unique
+  lead            Lead?        @relation(fields: [leadId], references: [id])
+
+  contactType     ContactType  @default(INDIVIDUAL)
+
+  // Datos de contacto
+  contactName     String
+  email           String?
+  phone           String
+
+  // Datos de empresa
+  businessName    String?
+  businessContact String?
+  businessEmail   String?
+  businessPhone   String?
+  vatNumber       String?
+
+  // Ubicación
+  address         String?
+  city            String?
+  postalCode      String?
+  latitude        Decimal?     @db.Decimal(10, 8)
+  longitude       Decimal?     @db.Decimal(11, 8)
+
+  // Asignación
+  assignedToUserId String?
+  assignedTo       User?       @relation(fields: [assignedToUserId], references: [id])
+
+  status          ClientStatus @default(ACTIVE)
+
+  // Datos adicionales
+  clientCode      String?      @unique
+  paymentMethod   String?
+  billingAddress  String?
+  notes           String?      @db.Text
+
+  // Métricas
+  totalRevenue    Decimal      @default(0) @db.Decimal(10, 2)
+
+  convertedAt     DateTime     @default(now())
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  // Relaciones
+  timeline        ContactTimeline[]
+  proposals       Proposal[]
+  sales           Sale[]
+  installations   Installation[]
+  maintenances    Maintenance[]
+  incidents       Incident[]
+
+  calendarEvents  CalendarEvent[]
+  routeStops      RouteStop[]
+
+  walletTransactions WalletTransaction[]
+
+  @@index([companyId])
+  @@index([assignedToUserId])
+  @@index([status])
+  @@map("clients")
+}
+
+enum TimelineAction {
+  CREATED
+  CONTACTED
+  EMAIL_SENT
+  CALL_MADE
+  MEETING_SCHEDULED
+  PROPOSAL_SENT
+  PROPOSAL_VIEWED
+  CONVERTED
+  NOTE_ADDED
+  STATUS_CHANGED
+  ASSIGNED
+  OTHER
+}
+
+model ContactTimeline {
+  id          String         @id @default(cuid())
+
+  entityType  String         // "lead" o "client"
+
+  leadId      String?
+  lead        Lead?          @relation(fields: [leadId], references: [id], onDelete: Cascade)
+
+  clientId    String?
+  client      Client?        @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  userId      String?
+
+  actionType  TimelineAction @default(OTHER)
+  description String         @db.Text
+  metadata    Json?          @db.JsonB
+
+  createdAt   DateTime       @default(now())
+
+  @@index([leadId])
+  @@index([clientId])
+  @@index([createdAt])
+  @@map("contact_timeline")
+}
+
+// ============================================
+// 4. PROPUESTAS Y PRESUPUESTOS
+// ============================================
+
+enum ProposalStatus {
+  DRAFT
+  SENT
+  VIEWED
+  ACCEPTED
+  REJECTED
+  EXPIRED
+}
+
+enum PaymentType {
+  SALE
+  RENTAL
+}
+
+model Proposal {
+  id              String         @id @default(cuid())
+  companyId       String
+  company         Company        @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  proposalNumber  String         @unique
+
+  leadId          String?
+  lead            Lead?          @relation(fields: [leadId], references: [id])
+
+  clientId        String?
+  client          Client?        @relation(fields: [clientId], references: [id])
+
+  createdBy       String
+  creator         User           @relation(fields: [createdBy], references: [id])
+
+  status          ProposalStatus @default(DRAFT)
+
+  totalAmount     Decimal        @default(0) @db.Decimal(10, 2)
+  paymentType     PaymentType    @default(SALE)
+  installments    Int            @default(1) // 1, 12, 24, 36, 48, 60
+
+  // Aprobación si el precio está por debajo del umbral
+  requiresApproval Boolean       @default(false)
+  approvedBy      String?
+  approver        User?          @relation("ApprovedBy", fields: [approvedBy], references: [id])
+  approvedAt      DateTime?
+
+  // Validez
+  validUntil      DateTime?
+
+  // Conversión
+  convertedToSale Boolean        @default(false)
+  sale            Sale?
+
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  // Relaciones
+  items           ProposalItem[]
+  rating          ProposalRating?
+
+  @@index([companyId])
+  @@index([leadId])
+  @@index([clientId])
+  @@index([createdBy])
+  @@index([status])
+  @@map("proposals")
+}
+
+model ProposalItem {
+  id                String   @id @default(cuid())
+  proposalId        String
+  proposal          Proposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+
+  productId         String
+  product           Product  @relation(fields: [productId], references: [id])
+
+  quantity          Int      @default(1)
+  unitPrice         Decimal  @db.Decimal(10, 2)
+  discountPercent   Decimal  @default(0) @db.Decimal(5, 2)
+  totalPrice        Decimal  @db.Decimal(10, 2)
+
+  customDescription String?  @db.Text
+
+  @@index([proposalId])
+  @@map("proposal_items")
+}
+
+model ProposalTemplate {
+  id          String   @id @default(cuid())
+  companyId   String
+  company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  name        String
+  headerHtml  String?  @db.Text
+  footerHtml  String?  @db.Text
+  stylesJson  Json?    @db.JsonB
+  isDefault   Boolean  @default(false)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([companyId])
+  @@map("proposal_templates")
+}
+
+model ProposalRating {
+  id          String   @id @default(cuid())
+  proposalId  String   @unique
+  proposal    Proposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+
+  rating      Int      // 1-5 estrellas
+  comments    String?  @db.Text
+
+  ratedAt     DateTime @default(now())
+
+  @@map("proposal_ratings")
+}
+
+// ============================================
+// 5. VENTAS
+// ============================================
+
+enum SaleStatus {
+  PENDING
+  CONFIRMED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+model Sale {
+  id              String      @id @default(cuid())
+  companyId       String
+  company         Company     @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  saleNumber      String      @unique
+
+  proposalId      String?     @unique
+  proposal        Proposal?   @relation(fields: [proposalId], references: [id])
+
+  clientId        String
+  client          Client      @relation(fields: [clientId], references: [id])
+
+  totalAmount     Decimal     @db.Decimal(10, 2)
+  saleType        PaymentType @default(SALE)
+  paymentTerms    Int         @default(1) // plazos
+
+  createdBy       String
+  creator         User        @relation(fields: [createdBy], references: [id])
+
+  saleDate        DateTime    @default(now())
+  status          SaleStatus  @default(PENDING)
+
+  // Puntos para ranking
+  pointsAwarded   Int         @default(0)
+
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  // Relaciones
+  items           SaleItem[]
+  installations   Installation[]
+
+  walletTransactions WalletTransaction[]
+
+  @@index([companyId])
+  @@index([clientId])
+  @@index([createdBy])
+  @@index([status])
+  @@index([saleDate])
+  @@map("sales")
+}
+
+model SaleItem {
+  id          String  @id @default(cuid())
+  saleId      String
+  sale        Sale    @relation(fields: [saleId], references: [id], onDelete: Cascade)
+
+  productId   String
+  product     Product @relation(fields: [productId], references: [id])
+
+  quantity    Int     @default(1)
+  unitPrice   Decimal @db.Decimal(10, 2)
+  totalPrice  Decimal @db.Decimal(10, 2)
+
+  @@index([saleId])
+  @@map("sale_items")
+}
+
+enum GoalType {
+  INDIVIDUAL
+  TEAM
+}
+
+enum GoalPeriod {
+  MONTHLY
+  YEARLY
+}
+
+model SalesGoal {
+  id             String     @id @default(cuid())
+  companyId      String
+  company        Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  userId         String?
+  user           User?      @relation(fields: [userId], references: [id])
+
+  teamId         String?    // ID del director o equipo
+
+  goalType       GoalType   @default(INDIVIDUAL)
+  period         GoalPeriod @default(MONTHLY)
+
+  year           Int
+  month          Int?       // null si es yearly
+
+  targetAmount   Decimal    @db.Decimal(10, 2)
+  targetUnits    Int?
+  targetPoints   Int?
+
+  currentAmount  Decimal    @default(0) @db.Decimal(10, 2)
+  currentUnits   Int        @default(0)
+  currentPoints  Int        @default(0)
+
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  @@unique([companyId, userId, period, year, month])
+  @@index([companyId])
+  @@index([userId])
+  @@map("sales_goals")
+}
+
+model SalesPointsConfig {
+  id          String      @id @default(cuid())
+  companyId   String
+  company     Company     @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  productId   String?
+  product     Product?    @relation(fields: [productId], references: [id])
+
+  saleType    PaymentType @default(SALE)
+  points      Int         @default(0)
+
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@index([companyId])
+  @@map("sales_points_config")
+}
+
+// ============================================
+// 6. INSTALACIONES
+// ============================================
+
+enum InstallationStatus {
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+model Installation {
+  id                String             @id @default(cuid())
+  companyId         String
+  company           Company            @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  saleId            String
+  sale              Sale               @relation(fields: [saleId], references: [id])
+
+  clientId          String
+  client            Client             @relation(fields: [clientId], references: [id])
+
+  assignedToUserId  String
+  assignedTo        User               @relation(fields: [assignedToUserId], references: [id])
+
+  status            InstallationStatus @default(SCHEDULED)
+
+  scheduledDate     DateTime
+  startedAt         DateTime?
+  completedAt       DateTime?
+
+  // Geolocalización de inicio
+  startLatitude     Decimal?           @db.Decimal(10, 8)
+  startLongitude    Decimal?           @db.Decimal(11, 8)
+  startAddress      String?
+
+  // Geolocalización de fin
+  endLatitude       Decimal?           @db.Decimal(10, 8)
+  endLongitude      Decimal?           @db.Decimal(11, 8)
+  endAddress        String?
+
+  // Radio máximo permitido (en metros)
+  maxDistanceMeters Int                @default(100)
+
+  notes             String?            @db.Text
+  signatureUrl      String?
+
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+
+  // Relaciones
+  materials         InstallationMaterial[]
+  photos            InstallationPhoto[]
+  maintenances      Maintenance[]
+  incidents         Incident[]
+
+  @@index([companyId])
+  @@index([saleId])
+  @@index([clientId])
+  @@index([assignedToUserId])
+  @@index([status])
+  @@index([scheduledDate])
+  @@map("installations")
+}
+
+model InstallationMaterial {
+  id             String       @id @default(cuid())
+  installationId String
+  installation   Installation @relation(fields: [installationId], references: [id], onDelete: Cascade)
+
+  productId      String
+  product        Product      @relation(fields: [productId], references: [id])
+
+  quantityUsed   Int
+
+  warehouseId    String?
+  warehouse      Warehouse?   @relation(fields: [warehouseId], references: [id])
+
+  @@index([installationId])
+  @@map("installation_materials")
+}
+
+model InstallationPhoto {
+  id             String       @id @default(cuid())
+  installationId String
+  installation   Installation @relation(fields: [installationId], references: [id], onDelete: Cascade)
+
+  url            String
+  caption        String?
+  takenAt        DateTime     @default(now())
+
+  @@index([installationId])
+  @@map("installation_photos")
+}
+
+// ============================================
+// 7. MANTENIMIENTOS
+// ============================================
+
+enum MaintenanceType {
+  PERIODIC
+  INCIDENT
+  EMERGENCY
+}
+
+enum MaintenanceStatus {
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+model Maintenance {
+  id                 String            @id @default(cuid())
+  companyId          String
+  company            Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  clientId           String
+  client             Client            @relation(fields: [clientId], references: [id])
+
+  installationId     String?
+  installation       Installation?     @relation(fields: [installationId], references: [id])
+
+  maintenanceType    MaintenanceType   @default(PERIODIC)
+
+  scheduledDate      DateTime
+  completedAt        DateTime?
+
+  assignedToUserId   String
+  assignedTo         User              @relation(fields: [assignedToUserId], references: [id])
+
+  status             MaintenanceStatus @default(SCHEDULED)
+
+  nextMaintenanceDate DateTime?
+
+  notes              String?           @db.Text
+
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+
+  // Relaciones
+  materials          MaintenanceMaterial[]
+  history            MaintenanceHistory[]
+
+  @@index([companyId])
+  @@index([clientId])
+  @@index([assignedToUserId])
+  @@index([status])
+  @@index([scheduledDate])
+  @@map("maintenances")
+}
+
+model MaintenanceMaterial {
+  id            String      @id @default(cuid())
+  maintenanceId String
+  maintenance   Maintenance @relation(fields: [maintenanceId], references: [id], onDelete: Cascade)
+
+  productId     String
+  product       Product     @relation(fields: [productId], references: [id])
+
+  quantityUsed  Int
+
+  @@index([maintenanceId])
+  @@map("maintenance_materials")
+}
+
+model MaintenanceHistory {
+  id            String       @id @default(cuid())
+  clientId      String
+
+  maintenanceId String
+  maintenance   Maintenance  @relation(fields: [maintenanceId], references: [id], onDelete: Cascade)
+
+  date          DateTime     @default(now())
+  description   String       @db.Text
+  technicianId  String
+
+  @@index([clientId])
+  @@index([maintenanceId])
+  @@map("maintenance_history")
+}
+
+// ============================================
+// 8. INCIDENCIAS
+// ============================================
+
+enum IncidentPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum IncidentStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+model Incident {
+  id               String           @id @default(cuid())
+  companyId        String
+  company          Company          @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  clientId         String
+  client           Client           @relation(fields: [clientId], references: [id])
+
+  installationId   String?
+  installation     Installation?    @relation(fields: [installationId], references: [id])
+
+  reportedByUserId String
+  reportedBy       User             @relation("ReportedBy", fields: [reportedByUserId], references: [id])
+
+  assignedToUserId String?
+  assignedTo       User?            @relation("AssignedTo", fields: [assignedToUserId], references: [id])
+
+  priority         IncidentPriority @default(MEDIUM)
+  status           IncidentStatus   @default(OPEN)
+  category         String?
+
+  description      String           @db.Text
+  resolution       String?          @db.Text
+
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  resolvedAt       DateTime?
+
+  @@index([companyId])
+  @@index([clientId])
+  @@index([assignedToUserId])
+  @@index([status])
+  @@index([priority])
+  @@map("incidents")
+}
+
+// ============================================
+// 9. ALMACÉN E INVENTARIO
+// ============================================
+
+enum WarehouseType {
+  CENTRAL
+  VEHICLE
+  EXTERNAL
+}
+
+model Warehouse {
+  id                    String            @id @default(cuid())
+  companyId             String
+  company               Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  name                  String
+  location              String?
+  warehouseType         WarehouseType     @default(CENTRAL)
+
+  managerUserId         String?
+
+  isActive              Boolean           @default(true)
+
+  createdAt             DateTime          @default(now())
+  updatedAt             DateTime          @updatedAt
+
+  // Relaciones
+  inventory             Inventory[]
+  movementsFrom         InventoryMovement[] @relation("FromWarehouse")
+  movementsTo           InventoryMovement[] @relation("ToWarehouse")
+  stockAlerts           StockAlert[]
+  loadingOrders         LoadingOrder[]
+  installationMaterials InstallationMaterial[]
+
+  @@index([companyId])
+  @@map("warehouses")
+}
+
+model Inventory {
+  id             String    @id @default(cuid())
+
+  warehouseId    String
+  warehouse      Warehouse @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+
+  productId      String
+  product        Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  quantity       Int       @default(0)
+  minStock       Int       @default(0)
+  maxStock       Int?
+
+  lastRestockDate DateTime?
+
+  updatedAt      DateTime  @updatedAt
+
+  @@unique([warehouseId, productId])
+  @@index([warehouseId])
+  @@index([productId])
+  @@map("inventory")
+}
+
+enum MovementType {
+  TRANSFER
+  SALE
+  PURCHASE
+  ADJUSTMENT
+  INSTALLATION
+  MAINTENANCE
+  RETURN
+}
+
+model InventoryMovement {
+  id              String       @id @default(cuid())
+  companyId       String
+  company         Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  fromWarehouseId String?
+  fromWarehouse   Warehouse?   @relation("FromWarehouse", fields: [fromWarehouseId], references: [id])
+
+  toWarehouseId   String?
+  toWarehouse     Warehouse?   @relation("ToWarehouse", fields: [toWarehouseId], references: [id])
+
+  productId       String
+  product         Product      @relation(fields: [productId], references: [id])
+
+  quantity        Int
+  movementType    MovementType @default(TRANSFER)
+
+  createdBy       String
+  notes           String?      @db.Text
+
+  createdAt       DateTime     @default(now())
+
+  @@index([companyId])
+  @@index([fromWarehouseId])
+  @@index([toWarehouseId])
+  @@index([productId])
+  @@index([createdAt])
+  @@map("inventory_movements")
+}
+
+enum LoadingOrderStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+model LoadingOrder {
+  id          String             @id @default(cuid())
+  companyId   String
+  company     Company            @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  userId      String
+  user        User               @relation(fields: [userId], references: [id])
+
+  warehouseId String
+  warehouse   Warehouse          @relation(fields: [warehouseId], references: [id])
+
+  status      LoadingOrderStatus @default(PENDING)
+
+  createdAt   DateTime           @default(now())
+  loadedAt    DateTime?
+
+  // Relaciones
+  items       LoadingOrderItem[]
+
+  @@index([companyId])
+  @@index([userId])
+  @@index([warehouseId])
+  @@map("loading_orders")
+}
+
+model LoadingOrderItem {
+  id              String       @id @default(cuid())
+  loadingOrderId  String
+  loadingOrder    LoadingOrder @relation(fields: [loadingOrderId], references: [id], onDelete: Cascade)
+
+  productId       String
+  product         Product      @relation(fields: [productId], references: [id])
+
+  quantity        Int
+
+  @@index([loadingOrderId])
+  @@map("loading_order_items")
+}
+
+enum AlertType {
+  LOW_STOCK
+  OUT_OF_STOCK
+  OVERSTOCK
+}
+
+model StockAlert {
+  id                       String    @id @default(cuid())
+
+  warehouseId              String
+  warehouse                Warehouse @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+
+  productId                String
+
+  alertType                AlertType @default(LOW_STOCK)
+  suggestedReorderQuantity Int?
+
+  createdAt                DateTime  @default(now())
+  resolvedAt               DateTime?
+
+  @@index([warehouseId])
+  @@index([productId])
+  @@index([resolvedAt])
+  @@map("stock_alerts")
+}
+
+// ============================================
+// 10. WALLET Y TRANSACCIONES
+// ============================================
+
+model Wallet {
+  id                String  @id @default(cuid())
+
+  userId            String  @unique
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  companyId         String
+  company           Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  balance           Decimal @default(0) @db.Decimal(10, 2)
+  pendingValidation Decimal @default(0) @db.Decimal(10, 2)
+
+  updatedAt         DateTime @updatedAt
+
+  // Relaciones
+  transactions      WalletTransaction[]
+
+  @@index([userId])
+  @@index([companyId])
+  @@map("wallets")
+}
+
+enum TransactionType {
+  COLLECTION
+  DELIVERY
+  EXPENSE
+  ADJUSTMENT
+}
+
+enum PaymentMethod {
+  CASH
+  CARD
+  TRANSFER
+  OTHER
+}
+
+enum TransactionStatus {
+  PENDING
+  VALIDATED
+  REJECTED
+}
+
+model WalletTransaction {
+  id             String            @id @default(cuid())
+
+  walletId       String
+  wallet         Wallet            @relation(fields: [walletId], references: [id], onDelete: Cascade)
+
+  userId         String
+  user           User              @relation(fields: [userId], references: [id])
+
+  transactionType TransactionType  @default(COLLECTION)
+  amount         Decimal           @db.Decimal(10, 2)
+  paymentMethod  PaymentMethod     @default(CASH)
+
+  saleId         String?
+  sale           Sale?             @relation(fields: [saleId], references: [id])
+
+  clientId       String?
+  client         Client?           @relation(fields: [clientId], references: [id])
+
+  status         TransactionStatus @default(PENDING)
+
+  validatedBy    String?
+  validatedAt    DateTime?
+
+  notes          String?           @db.Text
+
+  createdAt      DateTime          @default(now())
+
+  @@index([walletId])
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("wallet_transactions")
+}
+
+// ============================================
+// 11. AGENDA Y RUTAS
+// ============================================
+
+enum EventType {
+  VISIT
+  INSTALLATION
+  MAINTENANCE
+  CALL
+  MEETING
+  OTHER
+}
+
+enum EventStatus {
+  SCHEDULED
+  COMPLETED
+  CANCELLED
+  RESCHEDULED
+}
+
+model CalendarEvent {
+  id                String      @id @default(cuid())
+  companyId         String
+  company           Company     @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  userId            String
+  user              User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  eventType         EventType   @default(VISIT)
+
+  relatedEntityType String?     // "lead" o "client"
+
+  leadId            String?
+  lead              Lead?       @relation(fields: [leadId], references: [id])
+
+  clientId          String?
+  client            Client?     @relation(fields: [clientId], references: [id])
+
+  title             String
+  description       String?     @db.Text
+
+  startDatetime     DateTime
+  endDatetime       DateTime
+
+  location          String?
+  latitude          Decimal?    @db.Decimal(10, 8)
+  longitude         Decimal?    @db.Decimal(11, 8)
+
+  status            EventStatus @default(SCHEDULED)
+
+  createdBy         String?
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+
+  @@index([companyId])
+  @@index([userId])
+  @@index([leadId])
+  @@index([clientId])
+  @@index([startDatetime])
+  @@index([status])
+  @@map("calendar_events")
+}
+
+model Route {
+  id                      String   @id @default(cuid())
+  companyId               String
+  company                 Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  userId                  String
+  user                    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  routeDate               DateTime
+  totalDistanceKm         Decimal? @db.Decimal(8, 2)
+  estimatedDurationMinutes Int?
+
+  routeDataJson           Json?    @db.JsonB // waypoints, etc
+
+  createdAt               DateTime @default(now())
+
+  // Relaciones
+  stops                   RouteStop[]
+
+  @@index([companyId])
+  @@index([userId])
+  @@index([routeDate])
+  @@map("routes")
+}
+
+model RouteStop {
+  id                String    @id @default(cuid())
+  routeId           String
+  route             Route     @relation(fields: [routeId], references: [id], onDelete: Cascade)
+
+  order             Int
+
+  entityType        String    // "lead" o "client"
+
+  leadId            String?
+  lead              Lead?     @relation(fields: [leadId], references: [id])
+
+  clientId          String?
+  client            Client?   @relation(fields: [clientId], references: [id])
+
+  address           String
+  latitude          Decimal   @db.Decimal(10, 8)
+  longitude         Decimal   @db.Decimal(11, 8)
+
+  estimatedArrival  DateTime?
+  actualArrival     DateTime?
+
+  @@index([routeId])
+  @@map("route_stops")
+}
+
+// ============================================
+// 12. TELEMARKETING
+// ============================================
+
+enum CampaignStatus {
+  DRAFT
+  ACTIVE
+  PAUSED
+  COMPLETED
+}
+
+model TmkCampaign {
+  id          String         @id @default(cuid())
+  companyId   String
+  company     Company        @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  name        String
+  description String?        @db.Text
+
+  startDate   DateTime?
+  endDate     DateTime?
+  status      CampaignStatus @default(DRAFT)
+
+  createdBy   String?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  // Relaciones
+  callLists   TmkCallList[]
+
+  @@index([companyId])
+  @@index([status])
+  @@map("tmk_campaigns")
+}
+
+model TmkCallList {
+  id             String   @id @default(cuid())
+
+  campaignId     String
+  campaign       TmkCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+
+  name           String
+  totalContacts  Int      @default(0)
+  completedCalls Int      @default(0)
+
+  createdAt      DateTime @default(now())
+
+  // Relaciones
+  items          TmkCallListItem[]
+
+  @@index([campaignId])
+  @@map("tmk_call_lists")
+}
+
+enum CallListItemStatus {
+  PENDING
+  CALLED
+  INTERESTED
+  NOT_INTERESTED
+  NO_ANSWER
+  INVALID
+}
+
+model TmkCallListItem {
+  id           String              @id @default(cuid())
+
+  callListId   String
+  callList     TmkCallList         @relation(fields: [callListId], references: [id], onDelete: Cascade)
+
+  leadId       String
+  lead         Lead                @relation(fields: [leadId], references: [id])
+
+  status       CallListItemStatus  @default(PENDING)
+  callAttempts Int                 @default(0)
+  lastCallAt   DateTime?
+
+  @@index([callListId])
+  @@index([leadId])
+  @@index([status])
+  @@map("tmk_call_list_items")
+}
+
+enum CallOutcome {
+  ANSWERED
+  NO_ANSWER
+  BUSY
+  VOICEMAIL
+  INTERESTED
+  NOT_INTERESTED
+  CALLBACK_REQUESTED
+  INVALID_NUMBER
+}
+
+model TmkCall {
+  id                String       @id @default(cuid())
+  companyId         String
+  company           Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  userId            String
+  user              User         @relation(fields: [userId], references: [id])
+
+  leadId            String
+  lead              Lead         @relation(fields: [leadId], references: [id])
+
+  callListItemId    String?
+
+  callDate          DateTime     @default(now())
+  durationSeconds   Int?
+
+  outcome           CallOutcome?
+  notes             String?      @db.Text
+
+  scheduledCallback DateTime?
+
+  @@index([companyId])
+  @@index([userId])
+  @@index([leadId])
+  @@index([callDate])
+  @@map("tmk_calls")
+}
+
+model TmkScript {
+  id          String   @id @default(cuid())
+  companyId   String
+  company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  name        String
+  content     String   @db.Text
+  isActive    Boolean  @default(true)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([companyId])
+  @@map("tmk_scripts")
+}
+
+// ============================================
+// 13. MENSAJERÍA INTERNA
+// ============================================
+
+model InternalMessage {
+  id              String   @id @default(cuid())
+  companyId       String
+  company         Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  senderUserId    String
+  sender          User     @relation("Sender", fields: [senderUserId], references: [id])
+
+  recipientUserId String
+  recipient       User     @relation("Recipient", fields: [recipientUserId], references: [id])
+
+  subject         String
+  body            String   @db.Text
+
+  isRead          Boolean  @default(false)
+
+  sentAt          DateTime @default(now())
+  readAt          DateTime?
+
+  // Relaciones
+  attachments     MessageAttachment[]
+
+  @@index([companyId])
+  @@index([senderUserId])
+  @@index([recipientUserId])
+  @@index([sentAt])
+  @@map("internal_messages")
+}
+
+model MessageAttachment {
+  id        String          @id @default(cuid())
+  messageId String
+  message   InternalMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  fileUrl   String
+  fileName  String
+
+  @@index([messageId])
+  @@map("message_attachments")
+}
+
+// ============================================
+// 14. GASTOS
+// ============================================
+
+enum ExpenseStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model Expense {
+  id          String        @id @default(cuid())
+  companyId   String
+  company     Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  userId      String
+  user        User          @relation(fields: [userId], references: [id])
+
+  expenseType String
+  amount      Decimal       @db.Decimal(10, 2)
+  currency    String        @default("EUR")
+
+  expenseDate DateTime
+  description String?       @db.Text
+  receiptUrl  String?
+
+  status      ExpenseStatus @default(PENDING)
+
+  approvedBy  String?
+  approvedAt  DateTime?
+
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([companyId])
+  @@index([userId])
+  @@index([status])
+  @@index([expenseDate])
+  @@map("expenses")
+}
+
+// ============================================
+// 15. CONFIGURACIÓN Y LOGS
+// ============================================
+
+model CompanySetting {
+  id          String   @id @default(cuid())
+  companyId   String
+  company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  settingKey  String
+  settingValue String  @db.Text
+
+  updatedBy   String?
+  updatedAt   DateTime @updatedAt
+
+  @@unique([companyId, settingKey])
+  @@index([companyId])
+  @@map("company_settings")
+}
+
+model ActivityLog {
+  id          String   @id @default(cuid())
+  companyId   String?
+  company     Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  action      String
+  entityType  String?
+  entityId    String?
+
+  ipAddress   String?
+  userAgent   String?  @db.Text
+
+  metadata    Json?    @db.JsonB
+
+  createdAt   DateTime @default(now())
+
+  @@index([companyId])
+  @@index([userId])
+  @@index([createdAt])
+  @@index([entityType, entityId])
+  @@map("activity_logs")
+}
+
+model ApiKey {
+  id          String   @id @default(cuid())
+  companyId   String
+  company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  key         String   @unique
+  name        String
+  permissions Json?    @db.JsonB
+
+  isActive    Boolean  @default(true)
+
+  createdAt   DateTime @default(now())
+  lastUsedAt  DateTime?
+
+  @@index([companyId])
+  @@index([key])
+  @@map("api_keys")
+}

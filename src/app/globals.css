@@ -1,0 +1,142 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #ffffff;
+  --foreground: #1f1f1f;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #1f1f1f;
+    --foreground: #fafafa;
+  }
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: var(--font-inter), system-ui, sans-serif;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* Estilos para scrollbar personalizada */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f5f5f5;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #bfbfbf;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #8c8c8c;
+}
+
+/* Animaciones suaves */
+* {
+  @apply transition-colors duration-200;
+}
+
+/* Estilos para formularios */
+input:focus,
+textarea:focus,
+select:focus {
+  @apply outline-none ring-2 ring-primary-500;
+}
+
+/* Utilidades personalizadas */
+.card {
+  @apply bg-white rounded-lg shadow-soft p-6;
+}
+
+.btn {
+  @apply px-4 py-2 rounded-lg font-medium transition-all duration-200;
+}
+
+.btn-primary {
+  @apply bg-primary-500 text-white hover:bg-primary-600 active:bg-primary-700;
+}
+
+.btn-secondary {
+  @apply bg-neutral-100 text-neutral-800 hover:bg-neutral-200 active:bg-neutral-300;
+}
+
+.btn-danger {
+  @apply bg-error text-white hover:bg-error-dark;
+}
+
+.btn-success {
+  @apply bg-success text-white hover:bg-success-dark;
+}
+
+.input {
+  @apply w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent;
+}
+
+.label {
+  @apply block text-sm font-medium text-neutral-700 mb-1;
+}
+
+/* Tabla responsive */
+.table-container {
+  @apply overflow-x-auto;
+}
+
+.table {
+  @apply min-w-full divide-y divide-neutral-200;
+}
+
+.table thead {
+  @apply bg-neutral-50;
+}
+
+.table th {
+  @apply px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider;
+}
+
+.table td {
+  @apply px-6 py-4 whitespace-nowrap text-sm text-neutral-900;
+}
+
+/* Badge / Chip */
+.badge {
+  @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+}
+
+.badge-primary {
+  @apply bg-primary-100 text-primary-800;
+}
+
+.badge-success {
+  @apply bg-green-100 text-green-800;
+}
+
+.badge-warning {
+  @apply bg-yellow-100 text-yellow-800;
+}
+
+.badge-error {
+  @apply bg-red-100 text-red-800;
+}
+
+.badge-neutral {
+  @apply bg-neutral-100 text-neutral-800;
+}
+
+/* Loading spinner */
+.spinner {
+  @apply inline-block animate-spin rounded-full border-4 border-solid border-current border-r-transparent;
+}
