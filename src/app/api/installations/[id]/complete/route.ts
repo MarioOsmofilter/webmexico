@@ -63,7 +63,8 @@ export async function POST(
       )
     }
 
-    const { latitude, longitude, signature, notes } = await request.json()
+    const { latitude, longitude, signature, clientDni, notes } =
+      await request.json()
 
     if (!latitude || !longitude) {
       return NextResponse.json(
@@ -75,6 +76,30 @@ export async function POST(
     if (!signature) {
       return NextResponse.json(
         { error: "Se requiere la firma del cliente" },
+        { status: 400 }
+      )
+    }
+
+    if (!clientDni) {
+      return NextResponse.json(
+        { error: "Se requiere el DNI del cliente" },
+        { status: 400 }
+      )
+    }
+
+    // Verificar que se hayan subido las fotos requeridas
+    const photos = await prisma.installationPhoto.findMany({
+      where: { installationId: params.id },
+    })
+
+    const requiredPhotos = (installation.metadata as any)?.requiredPhotos || 2
+    const afterPhotos = photos.filter((p) => p.photoType === "AFTER")
+
+    if (afterPhotos.length < requiredPhotos) {
+      return NextResponse.json(
+        {
+          error: `Debes subir al menos ${requiredPhotos} fotos finales de la instalación. Actualmente: ${afterPhotos.length}`,
+        },
         { status: 400 }
       )
     }
@@ -119,6 +144,7 @@ export async function POST(
         endLatitude: latitude,
         endLongitude: longitude,
         signature,
+        clientDni,
         completionNotes: notes,
       },
     })

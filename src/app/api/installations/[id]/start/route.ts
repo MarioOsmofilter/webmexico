@@ -72,8 +72,22 @@ export async function POST(
       )
     }
 
-    // Verificar proximidad (radio de 100 metros)
-    const MAX_DISTANCE = 100 // metros
+    // Verificar que los materiales están cargados
+    if (!installation.materialsLoaded) {
+      return NextResponse.json(
+        {
+          error:
+            "Debes confirmar que has cargado los materiales en la furgoneta antes de iniciar",
+        },
+        { status: 400 }
+      )
+    }
+
+    // Verificar proximidad (máximo 1km, aviso entre 30m-1km)
+    const MAX_DISTANCE = 1000 // metros (1km)
+    const WARNING_DISTANCE = 30 // metros
+    let distanceWarning = null
+
     if (installation.latitude && installation.longitude) {
       const distance = getDistanceInMeters(
         latitude,
@@ -87,11 +101,18 @@ export async function POST(
           {
             error: `Estás demasiado lejos del punto de instalación (${Math.round(
               distance
-            )}m). Debes estar dentro de ${MAX_DISTANCE}m.`,
+            )}m). Debes estar dentro de ${MAX_DISTANCE}m para iniciar.`,
             distance: Math.round(distance),
           },
           { status: 400 }
         )
+      }
+
+      // Aviso si está entre 30m y 1km
+      if (distance > WARNING_DISTANCE) {
+        distanceWarning = `Estás a ${Math.round(
+          distance
+        )}m del punto de instalación. Asegúrate de estar en el lugar correcto (puede haber un bar u otro local cercano).`
       }
     }
 
@@ -118,11 +139,15 @@ export async function POST(
           latitude,
           longitude,
           timestamp: new Date(),
+          distanceWarning,
         },
       },
     })
 
-    return NextResponse.json({ installation: updated })
+    return NextResponse.json({
+      installation: updated,
+      warning: distanceWarning,
+    })
   } catch (error) {
     console.error("Error al iniciar instalación:", error)
     return NextResponse.json(
