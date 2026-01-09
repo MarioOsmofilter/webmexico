@@ -18,7 +18,7 @@ export async function GET(
         companyId: session.user.companyId,
       },
       include: {
-        assignedUser: {
+        assignedTo: {
           select: {
             id: true,
             firstName: true,
@@ -117,12 +117,12 @@ export async function PUT(
         state: data.state,
         postalCode: data.postalCode,
         country: data.country,
-        assignedTo: data.assignedTo,
+        assignedToUserId: data.assignedTo,
         notes: data.notes,
         metadata: data.metadata,
       },
       include: {
-        assignedUser: {
+        assignedTo: {
           select: {
             firstName: true,
             lastName: true,

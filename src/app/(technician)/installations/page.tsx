@@ -7,11 +7,11 @@ import { Badge } from "@/components/ui/Badge"
 import { EmptyState } from "@/components/ui/EmptyState"
 
 const STATUS_MAP = {
-  SCHEDULED: { label: "Programada", color: "blue" as const },
-  IN_PROGRESS: { label: "En Progreso", color: "yellow" as const },
-  COMPLETED: { label: "Completada", color: "green" as const },
-  CANCELLED: { label: "Cancelada", color: "red" as const },
-  POSTPONED: { label: "Postponida", color: "gray" as const },
+  SCHEDULED: { label: "Programada", variant: "primary" as const },
+  IN_PROGRESS: { label: "En Progreso", variant: "warning" as const },
+  COMPLETED: { label: "Completada", variant: "success" as const },
+  CANCELLED: { label: "Cancelada", variant: "error" as const },
+  POSTPONED: { label: "Postponida", variant: "neutral" as const },
 }
 
 export default async function InstallationsPage() {
@@ -178,11 +178,11 @@ export default async function InstallationsPage() {
                         <h3 className="font-semibold text-gray-900">
                           {installation.client.name}
                         </h3>
-                        <Badge color={STATUS_MAP[installation.status].color}>
+                        <Badge variant={STATUS_MAP[installation.status].variant}>
                           {STATUS_MAP[installation.status].label}
                         </Badge>
                         {hasMaterials && !allMaterialsLoaded && (
-                          <Badge color="red">⚠️ Sin cargar materiales</Badge>
+                          <Badge variant="error">⚠️ Sin cargar materiales</Badge>
                         )}
                       </div>
                       <p className="text-sm text-gray-600 mt-1">
@@ -261,7 +261,7 @@ export default async function InstallationsPage() {
                       <h3 className="font-semibold text-gray-900">
                         {installation.client.name}
                       </h3>
-                      <Badge color={STATUS_MAP[installation.status].color}>
+                      <Badge variant={STATUS_MAP[installation.status].variant}>
                         {STATUS_MAP[installation.status].label}
                       </Badge>
                     </div>

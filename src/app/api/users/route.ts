@@ -53,7 +53,7 @@ export async function GET(request: NextRequest) {
           select: {
             assignedLeads: true,
             assignedClients: true,
-            assignedInstallations: true,
+            installations: true,
           },
         },
       },

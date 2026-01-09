@@ -8,14 +8,14 @@ import { EmptyState } from "@/components/ui/EmptyState"
 
 // Mapeo de estados
 const STATUS_MAP = {
-  ACTIVE: { label: "Activo", color: "green" as const },
-  INACTIVE: { label: "Inactivo", color: "gray" as const },
-  SUSPENDED: { label: "Suspendido", color: "red" as const },
+  ACTIVE: { label: "Activo", variant: "success" as const },
+  INACTIVE: { label: "Inactivo", variant: "neutral" as const },
+  SUSPENDED: { label: "Suspendido", variant: "error" as const },
 }
 
 const TYPE_MAP = {
-  INDIVIDUAL: { label: "Individual", color: "blue" as const },
-  COMPANY: { label: "Empresa", color: "purple" as const },
+  INDIVIDUAL: { label: "Individual", variant: "primary" as const },
+  COMPANY: { label: "Empresa", variant: "primary" as const },
 }
 
 interface SearchParams {
@@ -68,7 +68,7 @@ export default async function ClientsPage({
   const clients = await prisma.client.findMany({
     where,
     include: {
-      assignedUser: {
+      assignedTo: {
         select: {
           firstName: true,
           lastName: true,
@@ -218,16 +218,16 @@ export default async function ClientsPage({
           <div className="mt-4 flex items-center gap-2">
             <span className="text-sm text-gray-500">Filtros activos:</span>
             {status && (
-              <Badge color={STATUS_MAP[status as keyof typeof STATUS_MAP]?.color || "gray"}>
+              <Badge variant={STATUS_MAP[status as keyof typeof STATUS_MAP]?.variant || "neutral"}>
                 {STATUS_MAP[status as keyof typeof STATUS_MAP]?.label}
               </Badge>
             )}
             {type && (
-              <Badge color={TYPE_MAP[type as keyof typeof TYPE_MAP]?.color || "gray"}>
+              <Badge variant={TYPE_MAP[type as keyof typeof TYPE_MAP]?.variant || "neutral"}>
                 {TYPE_MAP[type as keyof typeof TYPE_MAP]?.label}
               </Badge>
             )}
-            {search && <Badge color="gray">Búsqueda: {search}</Badge>}
+            {search && <Badge variant="neutral">Búsqueda: {search}</Badge>}
             <Link
               href="/sales/clients"
               className="text-sm text-blue-600 hover:text-blue-700 ml-2"
@@ -322,18 +322,18 @@ export default async function ClientsPage({
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <Badge color={TYPE_MAP[client.type].color}>
+                      <Badge variant={TYPE_MAP[client.type].variant}>
                         {TYPE_MAP[client.type].label}
                       </Badge>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <Badge color={STATUS_MAP[client.status].color}>
+                      <Badge variant={STATUS_MAP[client.status].variant}>
                         {STATUS_MAP[client.status].label}
                       </Badge>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {client.assignedUser
-                        ? `${client.assignedUser.firstName} ${client.assignedUser.lastName}`
+                      {client.assignedTo
+                        ? `${client.assignedTo.firstName} ${client.assignedTo.lastName}`
                         : "Sin asignar"}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">

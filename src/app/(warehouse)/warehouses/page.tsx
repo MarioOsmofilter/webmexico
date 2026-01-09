@@ -133,7 +133,7 @@ export default async function WarehousesPage() {
                       </p>
                     )}
                   </div>
-                  <Badge color={warehouse.isActive ? "green" : "gray"}>
+                  <Badge variant={warehouse.isActive ? "success" : "neutral"}>
                     {warehouse.isActive ? "Activo" : "Inactivo"}
                   </Badge>
                 </div>

@@ -8,12 +8,12 @@ import { EmptyState } from "@/components/ui/EmptyState"
 
 // Mapeo de estados
 const STATUS_MAP = {
-  DRAFT: { label: "Borrador", color: "gray" as const },
-  PENDING_APPROVAL: { label: "Pendiente Aprobación", color: "yellow" as const },
-  SENT: { label: "Enviada", color: "blue" as const },
-  ACCEPTED: { label: "Aceptada", color: "green" as const },
-  REJECTED: { label: "Rechazada", color: "red" as const },
-  EXPIRED: { label: "Expirada", color: "gray" as const },
+  DRAFT: { label: "Borrador", variant: "neutral" as const },
+  PENDING_APPROVAL: { label: "Pendiente Aprobación", variant: "warning" as const },
+  SENT: { label: "Enviada", variant: "primary" as const },
+  ACCEPTED: { label: "Aceptada", variant: "success" as const },
+  REJECTED: { label: "Rechazada", variant: "error" as const },
+  EXPIRED: { label: "Expirada", variant: "neutral" as const },
 }
 
 const PAYMENT_TYPE_MAP = {
@@ -218,11 +218,11 @@ export default async function ProposalsPage({
           <div className="mt-4 flex items-center gap-2">
             <span className="text-sm text-gray-500">Filtros activos:</span>
             {status && (
-              <Badge color={STATUS_MAP[status as keyof typeof STATUS_MAP]?.color || "gray"}>
+              <Badge variant={STATUS_MAP[status as keyof typeof STATUS_MAP]?.variant || "neutral"}>
                 {STATUS_MAP[status as keyof typeof STATUS_MAP]?.label}
               </Badge>
             )}
-            {search && <Badge color="gray">Búsqueda: {search}</Badge>}
+            {search && <Badge variant="neutral">Búsqueda: {search}</Badge>}
             <Link
               href="/sales/proposals"
               className="text-sm text-blue-600 hover:text-blue-700 ml-2"
@@ -306,7 +306,7 @@ export default async function ProposalsPage({
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <Badge color={STATUS_MAP[proposal.status].color}>
+                      <Badge variant={STATUS_MAP[proposal.status].variant}>
                         {STATUS_MAP[proposal.status].label}
                       </Badge>
                     </td>

@@ -8,12 +8,12 @@ import { ProposalActions } from "./ProposalActions"
 
 // Mapeo de estados
 const STATUS_MAP = {
-  DRAFT: { label: "Borrador", color: "gray" as const },
-  PENDING_APPROVAL: { label: "Pendiente Aprobación", color: "yellow" as const },
-  SENT: { label: "Enviada", color: "blue" as const },
-  ACCEPTED: { label: "Aceptada", color: "green" as const },
-  REJECTED: { label: "Rechazada", color: "red" as const },
-  EXPIRED: { label: "Expirada", color: "gray" as const },
+  DRAFT: { label: "Borrador", variant: "neutral" as const },
+  PENDING_APPROVAL: { label: "Pendiente Aprobación", variant: "warning" as const },
+  SENT: { label: "Enviada", variant: "primary" as const },
+  ACCEPTED: { label: "Aceptada", variant: "success" as const },
+  REJECTED: { label: "Rechazada", variant: "error" as const },
+  EXPIRED: { label: "Expirada", variant: "neutral" as const },
 }
 
 const PAYMENT_TYPE_MAP = {
@@ -144,7 +144,7 @@ export default async function ProposalDetailPage({
             )}
           </div>
           <div className="flex items-center gap-3">
-            <Badge color={STATUS_MAP[proposal.status].color}>
+            <Badge variant={STATUS_MAP[proposal.status].variant}>
               {STATUS_MAP[proposal.status].label}
             </Badge>
             <ProposalActions proposal={proposal} userRole={session.user.role} />

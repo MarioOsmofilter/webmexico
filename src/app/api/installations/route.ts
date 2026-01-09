@@ -64,7 +64,7 @@ export async function GET(request: NextRequest) {
             totalAmount: true,
           },
         },
-        assignedUser: {
+        assignedTo: {
           select: {
             firstName: true,
             lastName: true,
@@ -115,7 +115,7 @@ export async function POST(request: NextRequest) {
         companyId: session.user.companyId,
         clientId: data.clientId,
         saleId: data.saleId,
-        assignedTo: data.assignedTo || session.user.id,
+        assignedToUserId: data.assignedTo || session.user.id,
         scheduledDate: new Date(data.scheduledDate),
         estimatedDuration: data.estimatedDuration || 120,
         status: "SCHEDULED",
@@ -134,7 +134,7 @@ export async function POST(request: NextRequest) {
             name: true,
           },
         },
-        assignedUser: {
+        assignedTo: {
           select: {
             firstName: true,
             lastName: true,

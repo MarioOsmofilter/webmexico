@@ -9,13 +9,13 @@ import { TimelineView } from "./TimelineView"
 
 // Mapeo de estados
 const STATUS_MAP = {
-  NEW: { label: "Nuevo", color: "blue" as const },
-  CONTACTED: { label: "Contactado", color: "yellow" as const },
-  QUALIFIED: { label: "Calificado", color: "purple" as const },
-  PROPOSAL_SENT: { label: "Propuesta Enviada", color: "indigo" as const },
-  NEGOTIATION: { label: "Negociación", color: "orange" as const },
-  WON: { label: "Ganado", color: "green" as const },
-  LOST: { label: "Perdido", color: "red" as const },
+  NEW: { label: "Nuevo", variant: "primary" as const },
+  CONTACTED: { label: "Contactado", variant: "warning" as const },
+  QUALIFIED: { label: "Calificado", variant: "primary" as const },
+  PROPOSAL_SENT: { label: "Propuesta Enviada", variant: "primary" as const },
+  NEGOTIATION: { label: "Negociación", variant: "warning" as const },
+  WON: { label: "Ganado", variant: "success" as const },
+  LOST: { label: "Perdido", variant: "error" as const },
 }
 
 const SOURCE_MAP = {
@@ -29,19 +29,19 @@ const SOURCE_MAP = {
 }
 
 const INTEREST_LEVEL_MAP = {
-  LOW: { label: "Bajo", color: "gray" as const },
-  MEDIUM: { label: "Medio", color: "yellow" as const },
-  HIGH: { label: "Alto", color: "red" as const },
+  LOW: { label: "Bajo", variant: "neutral" as const },
+  MEDIUM: { label: "Medio", variant: "warning" as const },
+  HIGH: { label: "Alto", variant: "error" as const },
 }
 
 // Mapeo de estados de propuestas
 const PROPOSAL_STATUS_MAP = {
-  DRAFT: { label: "Borrador", color: "gray" as const },
-  PENDING_APPROVAL: { label: "Pendiente Aprobación", color: "yellow" as const },
-  SENT: { label: "Enviada", color: "blue" as const },
-  ACCEPTED: { label: "Aceptada", color: "green" as const },
-  REJECTED: { label: "Rechazada", color: "red" as const },
-  EXPIRED: { label: "Expirada", color: "gray" as const },
+  DRAFT: { label: "Borrador", variant: "neutral" as const },
+  PENDING_APPROVAL: { label: "Pendiente Aprobación", variant: "warning" as const },
+  SENT: { label: "Enviada", variant: "primary" as const },
+  ACCEPTED: { label: "Aceptada", variant: "success" as const },
+  REJECTED: { label: "Rechazada", variant: "error" as const },
+  EXPIRED: { label: "Expirada", variant: "neutral" as const },
 }
 
 export default async function LeadDetailPage({
@@ -61,7 +61,7 @@ export default async function LeadDetailPage({
       companyId: session.user.companyId,
     },
     include: {
-      assignedUser: {
+      assignedTo: {
         select: {
           id: true,
           firstName: true,
@@ -100,8 +100,8 @@ export default async function LeadDetailPage({
   // Verificar permisos: si no es director, solo puede ver leads asignados
   if (
     !["SUPERADMIN", "ADMIN", "DIRECTOR_SALES"].includes(session.user.role) &&
-    lead.assignedTo !== session.user.id &&
-    lead.assignedTo !== null
+    lead.assignedToUserId !== session.user.id &&
+    lead.assignedToUserId !== null
   ) {
     redirect("/sales/leads")
   }
@@ -126,7 +126,7 @@ export default async function LeadDetailPage({
             )}
           </div>
           <div className="flex items-center gap-3">
-            <Badge color={STATUS_MAP[lead.status].color}>
+            <Badge variant={STATUS_MAP[lead.status].variant}>
               {STATUS_MAP[lead.status].label}
             </Badge>
             <LeadActions lead={lead} />
@@ -211,7 +211,7 @@ export default async function LeadDetailPage({
 
               <div>
                 <p className="text-sm text-gray-500 mb-1">Nivel de Interés</p>
-                <Badge color={INTEREST_LEVEL_MAP[lead.interestLevel].color}>
+                <Badge variant={INTEREST_LEVEL_MAP[lead.interestLevel].variant}>
                   {INTEREST_LEVEL_MAP[lead.interestLevel].label}
                 </Badge>
               </div>
@@ -225,11 +225,11 @@ export default async function LeadDetailPage({
                 </div>
               )}
 
-              {lead.assignedUser && (
+              {lead.assignedTo && (
                 <div>
                   <p className="text-sm text-gray-500 mb-1">Asignado a</p>
                   <p className="text-gray-900">
-                    {lead.assignedUser.firstName} {lead.assignedUser.lastName}
+                    {lead.assignedTo.firstName} {lead.assignedTo.lastName}
                   </p>
                 </div>
               )}
@@ -296,7 +296,7 @@ export default async function LeadDetailPage({
                       </div>
                       <div className="text-right">
                         <Badge
-                          color={PROPOSAL_STATUS_MAP[proposal.status].color}
+                          variant={PROPOSAL_STATUS_MAP[proposal.status].variant}
                         >
                           {PROPOSAL_STATUS_MAP[proposal.status].label}
                         </Badge>

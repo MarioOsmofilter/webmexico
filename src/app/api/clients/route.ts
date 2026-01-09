@@ -52,7 +52,7 @@ export async function GET(request: NextRequest) {
     const clients = await prisma.client.findMany({
       where,
       include: {
-        assignedUser: {
+        assignedTo: {
           select: {
             firstName: true,
             lastName: true,
@@ -121,12 +121,12 @@ export async function POST(request: NextRequest) {
         state: data.state,
         postalCode: data.postalCode,
         country: data.country || "España",
-        assignedTo: data.assignedTo || session.user.id,
+        assignedToUserId: data.assignedTo || session.user.id,
         notes: data.notes,
         metadata: data.metadata || {},
       },
       include: {
-        assignedUser: {
+        assignedTo: {
           select: {
             firstName: true,
             lastName: true,

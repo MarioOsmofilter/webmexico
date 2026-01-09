@@ -28,7 +28,7 @@ export async function GET(
             },
           },
         },
-        assignedUser: {
+        assignedTo: {
           select: {
             id: true,
             firstName: true,
@@ -106,7 +106,7 @@ export async function PUT(
           : undefined,
         estimatedDuration: data.estimatedDuration,
         status: data.status,
-        assignedTo: data.assignedTo,
+        assignedToUserId: data.assignedTo,
         address: data.address,
         city: data.city,
         state: data.state,
@@ -122,7 +122,7 @@ export async function PUT(
             name: true,
           },
         },
-        assignedUser: {
+        assignedTo: {
           select: {
             firstName: true,
             lastName: true,

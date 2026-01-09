@@ -8,13 +8,13 @@ import { EmptyState } from "@/components/ui/EmptyState"
 
 // Mapeo de estados
 const STATUS_MAP = {
-  NEW: { label: "Nuevo", color: "blue" as const },
-  CONTACTED: { label: "Contactado", color: "yellow" as const },
-  QUALIFIED: { label: "Calificado", color: "purple" as const },
-  PROPOSAL_SENT: { label: "Propuesta Enviada", color: "indigo" as const },
-  NEGOTIATION: { label: "Negociación", color: "orange" as const },
-  WON: { label: "Ganado", color: "green" as const },
-  LOST: { label: "Perdido", color: "red" as const },
+  NEW: { label: "Nuevo", variant: "primary" as const },
+  CONTACTED: { label: "Contactado", variant: "warning" as const },
+  QUALIFIED: { label: "Calificado", variant: "primary" as const },
+  PROPOSAL_SENT: { label: "Propuesta Enviada", variant: "primary" as const },
+  NEGOTIATION: { label: "Negociación", variant: "warning" as const },
+  WON: { label: "Ganado", variant: "success" as const },
+  LOST: { label: "Perdido", variant: "error" as const },
 }
 
 // Mapeo de fuentes
@@ -80,7 +80,7 @@ export default async function LeadsPage({
   const leads = await prisma.lead.findMany({
     where,
     include: {
-      assignedUser: {
+      assignedTo: {
         select: {
           firstName: true,
           lastName: true,
@@ -234,16 +234,16 @@ export default async function LeadsPage({
           <div className="mt-4 flex items-center gap-2">
             <span className="text-sm text-gray-500">Filtros activos:</span>
             {status && (
-              <Badge color={STATUS_MAP[status as keyof typeof STATUS_MAP]?.color || "gray"}>
+              <Badge variant={STATUS_MAP[status as keyof typeof STATUS_MAP]?.variant || "neutral"}>
                 {STATUS_MAP[status as keyof typeof STATUS_MAP]?.label}
               </Badge>
             )}
             {source && (
-              <Badge color="gray">
+              <Badge variant="neutral">
                 {SOURCE_MAP[source as keyof typeof SOURCE_MAP]}
               </Badge>
             )}
-            {search && <Badge color="gray">Búsqueda: {search}</Badge>}
+            {search && <Badge variant="neutral">Búsqueda: {search}</Badge>}
             <Link
               href="/sales/leads"
               className="text-sm text-blue-600 hover:text-blue-700 ml-2"
@@ -329,7 +329,7 @@ export default async function LeadsPage({
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <Badge color={STATUS_MAP[lead.status].color}>
+                      <Badge variant={STATUS_MAP[lead.status].variant}>
                         {STATUS_MAP[lead.status].label}
                       </Badge>
                     </td>
@@ -337,8 +337,8 @@ export default async function LeadsPage({
                       {SOURCE_MAP[lead.source as keyof typeof SOURCE_MAP] || lead.source}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {lead.assignedUser
-                        ? `${lead.assignedUser.firstName} ${lead.assignedUser.lastName}`
+                      {lead.assignedTo
+                        ? `${lead.assignedTo.firstName} ${lead.assignedTo.lastName}`
                         : "Sin asignar"}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">

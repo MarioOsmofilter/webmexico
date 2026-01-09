@@ -100,7 +100,7 @@ export default async function WarehouseDetailPage({
               </p>
             )}
           </div>
-          <Badge color={warehouse.isActive ? "green" : "gray"}>
+          <Badge variant={warehouse.isActive ? "success" : "neutral"}>
             {warehouse.isActive ? "Activo" : "Inactivo"}
           </Badge>
         </div>
@@ -244,9 +244,9 @@ export default async function WarehouseDetailPage({
                         </td>
                         <td className="px-4 py-3">
                           {isLow ? (
-                            <Badge color="red">Stock Bajo</Badge>
+                            <Badge variant="error">Stock Bajo</Badge>
                           ) : (
-                            <Badge color="green">Normal</Badge>
+                            <Badge variant="success">Normal</Badge>
                           )}
                         </td>
                       </tr>

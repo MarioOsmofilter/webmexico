@@ -7,23 +7,23 @@ import { Badge } from "@/components/ui/Badge"
 import { ClientActions } from "./ClientActions"
 
 const STATUS_MAP = {
-  ACTIVE: { label: "Activo", color: "green" as const },
-  INACTIVE: { label: "Inactivo", color: "gray" as const },
-  SUSPENDED: { label: "Suspendido", color: "red" as const },
+  ACTIVE: { label: "Activo", variant: "success" as const },
+  INACTIVE: { label: "Inactivo", variant: "neutral" as const },
+  SUSPENDED: { label: "Suspendido", variant: "error" as const },
 }
 
 const TYPE_MAP = {
-  INDIVIDUAL: { label: "Individual", color: "blue" as const },
-  COMPANY: { label: "Empresa", color: "purple" as const },
+  INDIVIDUAL: { label: "Individual", variant: "primary" as const },
+  COMPANY: { label: "Empresa", variant: "primary" as const },
 }
 
 const PROPOSAL_STATUS_MAP = {
-  DRAFT: { label: "Borrador", color: "gray" as const },
-  PENDING_APPROVAL: { label: "Pendiente", color: "yellow" as const },
-  SENT: { label: "Enviada", color: "blue" as const },
-  ACCEPTED: { label: "Aceptada", color: "green" as const },
-  REJECTED: { label: "Rechazada", color: "red" as const },
-  EXPIRED: { label: "Expirada", color: "gray" as const },
+  DRAFT: { label: "Borrador", variant: "neutral" as const },
+  PENDING_APPROVAL: { label: "Pendiente", variant: "warning" as const },
+  SENT: { label: "Enviada", variant: "primary" as const },
+  ACCEPTED: { label: "Aceptada", variant: "success" as const },
+  REJECTED: { label: "Rechazada", variant: "error" as const },
+  EXPIRED: { label: "Expirada", variant: "neutral" as const },
 }
 
 export default async function ClientDetailPage({
@@ -43,7 +43,7 @@ export default async function ClientDetailPage({
       companyId: session.user.companyId,
     },
     include: {
-      assignedUser: {
+      assignedTo: {
         select: {
           id: true,
           firstName: true,
@@ -91,8 +91,8 @@ export default async function ClientDetailPage({
   // Verificar permisos
   if (
     !["SUPERADMIN", "ADMIN", "DIRECTOR_SALES"].includes(session.user.role) &&
-    client.assignedTo !== session.user.id &&
-    client.assignedTo !== null
+    client.assignedToUserId !== session.user.id &&
+    client.assignedToUserId !== null
   ) {
     redirect("/sales/clients")
   }
@@ -119,7 +119,7 @@ export default async function ClientDetailPage({
               <h1 className="text-2xl font-bold text-gray-900">
                 {client.name}
               </h1>
-              <Badge color={TYPE_MAP[client.type].color}>
+              <Badge variant={TYPE_MAP[client.type].variant}>
                 {TYPE_MAP[client.type].label}
               </Badge>
             </div>
@@ -130,7 +130,7 @@ export default async function ClientDetailPage({
             )}
           </div>
           <div className="flex items-center gap-3">
-            <Badge color={STATUS_MAP[client.status].color}>
+            <Badge variant={STATUS_MAP[client.status].variant}>
               {STATUS_MAP[client.status].label}
             </Badge>
             <ClientActions client={client} />
@@ -209,12 +209,12 @@ export default async function ClientDetailPage({
                 </div>
               )}
 
-              {client.assignedUser && (
+              {client.assignedTo && (
                 <div>
                   <p className="text-sm text-gray-500 mb-1">Asignado a</p>
                   <p className="text-gray-900">
-                    {client.assignedUser.firstName}{" "}
-                    {client.assignedUser.lastName}
+                    {client.assignedTo.firstName}{" "}
+                    {client.assignedTo.lastName}
                   </p>
                 </div>
               )}
@@ -285,7 +285,7 @@ export default async function ClientDetailPage({
                         </p>
                       </div>
                       <div className="text-right">
-                        <Badge color={PROPOSAL_STATUS_MAP[proposal.status].color}>
+                        <Badge variant={PROPOSAL_STATUS_MAP[proposal.status].variant}>
                           {PROPOSAL_STATUS_MAP[proposal.status].label}
                         </Badge>
                         <p className="text-xs text-gray-500 mt-1">
@@ -367,12 +367,12 @@ export default async function ClientDetailPage({
                         </p>
                       </div>
                       <Badge
-                        color={
+                        variant={
                           installation.status === "COMPLETED"
-                            ? "green"
+                            ? "success"
                             : installation.status === "IN_PROGRESS"
-                            ? "blue"
-                            : "yellow"
+                            ? "primary"
+                            : "warning"
                         }
                       >
                         {installation.status}
