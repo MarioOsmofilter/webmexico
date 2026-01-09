@@ -301,7 +301,7 @@ export default async function CalendarPage() {
                         {event.title}
                       </h3>
                       <Badge
-                        color={
+                        variant={
                           EVENT_TYPE_COLORS[
                             event.eventType as keyof typeof EVENT_TYPE_COLORS
                           ]
@@ -314,7 +314,7 @@ export default async function CalendarPage() {
                         }
                       </Badge>
                       <Badge
-                        color={
+                        variant={
                           STATUS_COLORS[
                             event.status as keyof typeof STATUS_COLORS
                           ]
