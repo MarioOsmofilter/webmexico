@@ -159,6 +159,7 @@ async function testDatabase() {
       data: {
         companyId: testCompany.id,
         leadId: lead.id,
+        name: lead.contactName,
         contactType: 'INDIVIDUAL',
         contactName: lead.contactName,
         email: lead.email,
