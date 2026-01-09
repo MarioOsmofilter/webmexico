@@ -25,7 +25,7 @@ export default async function UsersPage() {
         select: {
           assignedLeads: true,
           assignedClients: true,
-          assignedInstallations: true,
+          installations: true,
         },
       },
     },
@@ -154,9 +154,9 @@ export default async function UsersPage() {
                           👥 {user._count.assignedClients}
                         </span>
                       )}
-                      {user._count.assignedInstallations > 0 && (
+                      {user._count.installations > 0 && (
                         <span title="Instalaciones">
-                          🔧 {user._count.assignedInstallations}
+                          🔧 {user._count.installations}
                         </span>
                       )}
                     </div>
