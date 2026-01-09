@@ -14,13 +14,13 @@ const EVENT_TYPE_LABELS: Record<string, string> = {
   OTHER: "Otro",
 }
 
-const EVENT_TYPE_COLORS: Record<string, string> = {
-  VISIT: "blue",
-  INSTALLATION: "purple",
-  MAINTENANCE: "orange",
-  CALL: "green",
-  MEETING: "indigo",
-  OTHER: "gray",
+const EVENT_TYPE_COLORS: Record<string, "primary" | "success" | "warning" | "error" | "neutral"> = {
+  VISIT: "primary",
+  INSTALLATION: "primary",
+  MAINTENANCE: "warning",
+  CALL: "success",
+  MEETING: "primary",
+  OTHER: "neutral",
 }
 
 const STATUS_LABELS: Record<string, string> = {
@@ -30,11 +30,11 @@ const STATUS_LABELS: Record<string, string> = {
   RESCHEDULED: "Reprogramado",
 }
 
-const STATUS_COLORS: Record<string, string> = {
-  SCHEDULED: "blue",
-  COMPLETED: "green",
-  CANCELLED: "red",
-  RESCHEDULED: "yellow",
+const STATUS_COLORS: Record<string, "primary" | "success" | "warning" | "error" | "neutral"> = {
+  SCHEDULED: "primary",
+  COMPLETED: "success",
+  CANCELLED: "error",
+  RESCHEDULED: "warning",
 }
 
 export default async function CalendarPage() {
@@ -234,7 +234,7 @@ export default async function CalendarPage() {
                       </p>
                       <div className="flex items-center gap-2 mt-1">
                         <Badge
-                          color={
+                          variant={
                             EVENT_TYPE_COLORS[
                               event.eventType as keyof typeof EVENT_TYPE_COLORS
                             ]
@@ -247,7 +247,7 @@ export default async function CalendarPage() {
                           }
                         </Badge>
                         <Badge
-                          color={
+                          variant={
                             STATUS_COLORS[
                               event.status as keyof typeof STATUS_COLORS
                             ]
