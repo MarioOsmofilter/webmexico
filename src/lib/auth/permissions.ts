@@ -194,15 +194,15 @@ export const ROLE_NAMES: Record<UserRole, string> = {
 }
 
 // Colores de roles (para UI)
-export const ROLE_COLORS: Record<UserRole, string> = {
-  SUPERADMIN: "purple",
-  ADMIN: "blue",
-  DIRECTOR_SALES: "green",
-  DIRECTOR_INSTALLATIONS: "orange",
-  DIRECTOR_MARKETING: "pink",
-  SALES: "cyan",
-  TECHNICIAN: "yellow",
-  MARKETING: "indigo",
-  WAREHOUSE: "gray",
+export const ROLE_COLORS: Record<UserRole, "primary" | "success" | "warning" | "error" | "neutral"> = {
+  SUPERADMIN: "primary",
+  ADMIN: "primary",
+  DIRECTOR_SALES: "success",
+  DIRECTOR_INSTALLATIONS: "warning",
+  DIRECTOR_MARKETING: "primary",
+  SALES: "primary",
+  TECHNICIAN: "warning",
+  MARKETING: "primary",
+  WAREHOUSE: "neutral",
   CUSTOM: "neutral",
 }

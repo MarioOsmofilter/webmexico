@@ -125,7 +125,7 @@ export default async function UsersPage() {
                   </td>
                   <td className="px-6 py-4">
                     <Badge
-                      color={
+                      variant={
                         ROLE_COLORS[user.role as keyof typeof ROLE_COLORS]
                       }
                     >
@@ -133,7 +133,7 @@ export default async function UsersPage() {
                     </Badge>
                   </td>
                   <td className="px-6 py-4">
-                    <Badge color={user.isActive ? "green" : "red"}>
+                    <Badge variant={user.isActive ? "success" : "error"}>
                       {user.isActive ? "Activo" : "Inactivo"}
                     </Badge>
                     {user.forcePasswordChange && (
