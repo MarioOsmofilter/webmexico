@@ -437,7 +437,6 @@ model Lead {
   contactName       String
   email             String?
   phone             String
-  company           String?
   position          String?
 
   // Datos de empresa (si es BUSINESS)

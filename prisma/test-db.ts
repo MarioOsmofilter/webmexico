@@ -118,6 +118,7 @@ async function testDatabase() {
 
     await prisma.contactTimeline.create({
       data: {
+        entityType: 'lead',
         leadId: lead.id,
         userId: comercial.id,
         actionType: 'CREATED',
@@ -296,6 +297,7 @@ async function testDatabase() {
 
     await prisma.contactTimeline.create({
       data: {
+        entityType: 'lead',
         leadId: testLead.id,
         actionType: 'CREATED',
         description: 'Test cascade',

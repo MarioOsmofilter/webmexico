@@ -28,6 +28,13 @@ export function formatDateTime(date: Date | string): string {
 }
 
 /**
+ * Formatear hora
+ */
+export function formatTime(date: Date | string): string {
+  return formatDate(date, "HH:mm")
+}
+
+/**
  * Formatear tiempo relativo (hace 2 horas, hace 3 días)
  */
 export function formatRelativeTime(date: Date | string): string {

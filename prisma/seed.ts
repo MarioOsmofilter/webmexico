@@ -218,10 +218,13 @@ async function main() {
   const centralWarehouse = await prisma.warehouse.create({
     data: {
       name: 'Almacén Central',
-      location: 'Polígono Industrial, Nave 5',
-      warehouseType: 'CENTRAL',
+      address: 'Polígono Industrial, Nave 5',
+      city: 'Madrid',
+      state: 'Madrid',
+      postalCode: '28001',
       companyId: demoCompany.id,
-      managerUserId: warehouse.id,
+      managerId: warehouse.id,
+      isActive: true,
     }
   })
 
