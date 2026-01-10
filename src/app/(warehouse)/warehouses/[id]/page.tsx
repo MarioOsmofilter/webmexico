@@ -222,9 +222,9 @@ export default async function WarehouseDetailPage({
                               <p className="font-medium text-gray-900">
                                 {item.product.name}
                               </p>
-                              {item.product.reference && (
+                              {item.product.internalReference && (
                                 <p className="text-xs text-gray-500">
-                                  {item.product.reference}
+                                  {item.product.internalReference}
                                 </p>
                               )}
                             </div>

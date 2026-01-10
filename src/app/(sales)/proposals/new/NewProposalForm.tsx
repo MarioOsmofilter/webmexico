@@ -432,9 +432,9 @@ export function NewProposalForm({
                               <h3 className="font-medium text-gray-900">
                                 {item.product.name}
                               </h3>
-                              {item.product.reference && (
+                              {item.product.internalReference && (
                                 <p className="text-sm text-gray-500">
-                                  Ref: {item.product.reference}
+                                  Ref: {item.product.internalReference}
                                 </p>
                               )}
                             </div>

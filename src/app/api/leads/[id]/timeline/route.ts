@@ -34,25 +34,17 @@ export async function POST(
     }
 
     // Crear entrada en timeline
-    const timelineEntry = await prisma.leadTimeline.create({
+    const timelineEntry = await prisma.contactTimeline.create({
       data: {
         leadId: params.id,
-        eventType,
+        actionType: eventType,
         description,
         userId: session.user.id,
-      },
-      include: {
-        user: {
-          select: {
-            firstName: true,
-            lastName: true,
-          },
-        },
       },
     })
 
     // Actualizar lastContactDate del lead si es relevante
-    if (["CALL", "EMAIL", "MEETING"].includes(eventType)) {
+    if (["CALL_MADE", "EMAIL_SENT", "MEETING_SCHEDULED"].includes(eventType)) {
       await prisma.lead.update({
         where: { id: params.id },
         data: { lastContactDate: new Date() },

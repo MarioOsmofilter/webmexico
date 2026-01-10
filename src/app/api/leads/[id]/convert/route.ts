@@ -52,7 +52,7 @@ export async function POST(
     const client = await prisma.client.create({
       data: {
         companyId: lead.companyId,
-        name: lead.company || lead.contactName,
+        name: lead.businessName || lead.contactName,
         contactName: lead.contactName,
         email: lead.email,
         phone: lead.phone,
@@ -60,7 +60,7 @@ export async function POST(
         city: lead.city,
         state: lead.state,
         postalCode: lead.postalCode,
-        assignedTo: lead.assignedTo,
+        assignedToUserId: lead.assignedToUserId,
         notes: lead.notes,
         status: "ACTIVE",
         type: "INDIVIDUAL", // O "COMPANY" si tiene empresa
@@ -77,10 +77,10 @@ export async function POST(
     })
 
     // Agregar entrada al timeline del lead
-    await prisma.leadTimeline.create({
+    await prisma.contactTimeline.create({
       data: {
         leadId: params.id,
-        eventType: "STATUS_CHANGE",
+        actionType: "CONVERTED",
         description: `Lead convertido a cliente: ${client.name}`,
         userId: session.user.id,
       },

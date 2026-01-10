@@ -76,14 +76,6 @@ export default async function LeadDetailPage({
         },
       },
       timeline: {
-        include: {
-          user: {
-            select: {
-              firstName: true,
-              lastName: true,
-            },
-          },
-        },
         orderBy: {
           createdAt: "desc",
         },
@@ -207,12 +199,14 @@ export default async function LeadDetailPage({
                 </p>
               </div>
 
-              <div>
-                <p className="text-sm text-gray-500 mb-1">Nivel de Interés</p>
-                <Badge variant={INTEREST_LEVEL_MAP[lead.interestLevel].variant}>
-                  {INTEREST_LEVEL_MAP[lead.interestLevel].label}
-                </Badge>
-              </div>
+              {lead.interestLevel && (
+                <div>
+                  <p className="text-sm text-gray-500 mb-1">Nivel de Interés</p>
+                  <Badge variant={INTEREST_LEVEL_MAP[lead.interestLevel].variant}>
+                    {INTEREST_LEVEL_MAP[lead.interestLevel].label}
+                  </Badge>
+                </div>
+              )}
 
               {lead.estimatedValue && (
                 <div>

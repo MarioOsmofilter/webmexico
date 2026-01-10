@@ -10,10 +10,6 @@ interface TimelineEntry {
   eventType: string
   description: string
   createdAt: Date
-  user: {
-    firstName: string
-    lastName: string
-  } | null
 }
 
 interface TimelineViewProps {
@@ -22,30 +18,36 @@ interface TimelineViewProps {
 }
 
 const EVENT_TYPE_ICONS: Record<string, string> = {
-  NOTE: "📝",
-  CALL: "📞",
-  EMAIL: "📧",
-  MEETING: "🤝",
-  STATUS_CHANGE: "🔄",
-  PROPOSAL_CREATED: "📄",
-  OTHER: "📌",
+  NOTE_ADDED: "📝",
+  CALL_MADE: "📞",
+  EMAIL_SENT: "📧",
+  MEETING_SCHEDULED: "🤝",
+  STATUS_CHANGED: "🔄",
+  PROPOSAL_SENT: "📄",
+  CONTACTED: "📞",
+  CREATED: "✨",
+  CONVERTED: "✅",
+  PROPOSAL_VIEWED: "👁️",
 }
 
 const EVENT_TYPE_LABELS: Record<string, string> = {
-  NOTE: "Nota",
-  CALL: "Llamada",
-  EMAIL: "Email",
-  MEETING: "Reunión",
-  STATUS_CHANGE: "Cambio de Estado",
-  PROPOSAL_CREATED: "Propuesta Creada",
-  OTHER: "Otro",
+  NOTE_ADDED: "Nota",
+  CALL_MADE: "Llamada",
+  EMAIL_SENT: "Email",
+  MEETING_SCHEDULED: "Reunión",
+  STATUS_CHANGED: "Cambio de Estado",
+  PROPOSAL_SENT: "Propuesta Enviada",
+  CONTACTED: "Contactado",
+  CREATED: "Creado",
+  CONVERTED: "Convertido",
+  PROPOSAL_VIEWED: "Propuesta Vista",
 }
 
 export function TimelineView({ timeline, leadId }: TimelineViewProps) {
   const router = useRouter()
   const [showForm, setShowForm] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [eventType, setEventType] = useState("NOTE")
+  const [eventType, setEventType] = useState("NOTE_ADDED")
   const [description, setDescription] = useState("")
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -69,7 +71,7 @@ export function TimelineView({ timeline, leadId }: TimelineViewProps) {
       }
 
       setDescription("")
-      setEventType("NOTE")
+      setEventType("NOTE_ADDED")
       setShowForm(false)
       router.refresh()
     } catch (error) {
@@ -169,12 +171,6 @@ export function TimelineView({ timeline, leadId }: TimelineViewProps) {
                   <p className="text-sm text-gray-600 mt-1 whitespace-pre-wrap">
                     {entry.description}
                   </p>
-
-                  {entry.user && (
-                    <p className="text-xs text-gray-500 mt-1">
-                      Por {entry.user.firstName} {entry.user.lastName}
-                    </p>
-                  )}
                 </div>
               </div>
             </div>
