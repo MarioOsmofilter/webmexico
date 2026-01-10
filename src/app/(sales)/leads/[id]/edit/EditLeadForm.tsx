@@ -34,7 +34,7 @@ interface Lead {
   state: string | null
   postalCode: string | null
   notes: string | null
-  assignedTo: string | null
+  assignedToUserId: string | null
 }
 
 interface User {
@@ -63,7 +63,7 @@ export function EditLeadForm({ lead, availableUsers }: EditLeadFormProps) {
       contactName: formData.get("contactName"),
       email: formData.get("email") || undefined,
       phone: formData.get("phone") || undefined,
-      company: formData.get("company") || undefined,
+      businessName: formData.get("businessName") || undefined,
       position: formData.get("position") || undefined,
       source: formData.get("source"),
       interestLevel: formData.get("interestLevel"),
@@ -75,7 +75,7 @@ export function EditLeadForm({ lead, availableUsers }: EditLeadFormProps) {
       state: formData.get("state") || undefined,
       postalCode: formData.get("postalCode") || undefined,
       notes: formData.get("notes") || undefined,
-      assignedTo: formData.get("assignedTo") || undefined,
+      assignedToUserId: formData.get("assignedToUserId") || undefined,
     }
 
     try {
@@ -279,15 +279,15 @@ export function EditLeadForm({ lead, availableUsers }: EditLeadFormProps) {
             {availableUsers.length > 0 && (
               <div>
                 <label
-                  htmlFor="assignedTo"
+                  htmlFor="assignedToUserId"
                   className="block text-sm font-medium text-gray-700 mb-1"
                 >
                   Asignado a
                 </label>
                 <select
-                  id="assignedTo"
-                  name="assignedTo"
-                  defaultValue={lead.assignedTo || ""}
+                  id="assignedToUserId"
+                  name="assignedToUserId"
+                  defaultValue={lead.assignedToUserId || ""}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
                   <option value="">Sin asignar</option>
