@@ -126,7 +126,7 @@ export function TimelineView({ timeline, leadId }: TimelineViewProps) {
               />
             </div>
 
-            <Button type="submit" loading={loading} className="w-full">
+            <Button type="submit" isLoading={loading} className="w-full">
               Agregar
             </Button>
           </div>

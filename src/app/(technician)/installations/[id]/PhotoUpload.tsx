@@ -115,7 +115,7 @@ export function PhotoUpload({
             <div className="cursor-pointer">
               <Button
                 as="span"
-                loading={uploading}
+                isLoading={uploading}
                 disabled={uploading}
                 className="w-full"
               >

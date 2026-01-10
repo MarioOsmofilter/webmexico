@@ -357,7 +357,7 @@ export default function NewClientPage() {
           >
             Cancelar
           </Link>
-          <Button type="submit" loading={loading}>
+          <Button type="submit" isLoading={loading}>
             Crear Cliente
           </Button>
         </div>

@@ -132,7 +132,7 @@ export function StartInstallationForm({
         >
           Cancelar
         </button>
-        <Button onClick={handleStart} loading={loading} className="flex-1">
+        <Button onClick={handleStart} isLoading={loading} className="flex-1">
           Verificar Ubicación e Iniciar
         </Button>
       </div>

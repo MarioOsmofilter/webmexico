@@ -261,7 +261,7 @@ export function CompleteInstallationForm({
         </button>
         <Button
           onClick={handleComplete}
-          loading={loading}
+          isLoading={loading}
           className="flex-1 bg-green-600 hover:bg-green-700"
         >
           Completar Instalación

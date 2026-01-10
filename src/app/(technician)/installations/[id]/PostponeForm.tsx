@@ -126,7 +126,7 @@ export function PostponeForm({
         </button>
         <Button
           onClick={handlePostpone}
-          loading={loading}
+          isLoading={loading}
           className="flex-1 bg-orange-600 hover:bg-orange-700"
         >
           Postponer Instalación

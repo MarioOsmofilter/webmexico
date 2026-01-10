@@ -408,7 +408,7 @@ export function EditLeadForm({ lead, availableUsers }: EditLeadFormProps) {
           >
             Cancelar
           </Link>
-          <Button type="submit" loading={loading}>
+          <Button type="submit" isLoading={loading}>
             Guardar Cambios
           </Button>
         </div>

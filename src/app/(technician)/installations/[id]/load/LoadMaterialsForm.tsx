@@ -256,7 +256,7 @@ export function LoadMaterialsForm({ installation }: LoadMaterialsFormProps) {
         </Link>
         <Button
           onClick={handleSubmit}
-          loading={loading}
+          isLoading={loading}
           disabled={noneSelected}
           className="flex-1 py-3"
         >

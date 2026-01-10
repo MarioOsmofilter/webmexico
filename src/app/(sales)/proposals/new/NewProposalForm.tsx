@@ -606,7 +606,7 @@ export function NewProposalForm({
               <div className="mt-6 space-y-2">
                 <Button
                   type="submit"
-                  loading={loading}
+                  isLoading={loading}
                   className="w-full"
                   disabled={items.length === 0 || (!leadId && !clientId)}
                 >
