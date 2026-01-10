@@ -28,8 +28,8 @@ export default async function EditLeadPage({
   // Verificar permisos
   if (
     !["SUPERADMIN", "ADMIN", "DIRECTOR_SALES"].includes(session.user.role) &&
-    lead.assignedTo !== session.user.id &&
-    lead.assignedTo !== null
+    lead.assignedToUserId !== session.user.id &&
+    lead.assignedToUserId !== null
   ) {
     redirect("/sales/leads")
   }

@@ -7,11 +7,9 @@ import { Button } from "@/components/ui/Button"
 
 const SOURCES = [
   { value: "WEB", label: "Web" },
-  { value: "PHONE", label: "Teléfono" },
-  { value: "EMAIL", label: "Email" },
+  { value: "TELEMARKETING", label: "Telemarketing" },
+  { value: "MANUAL", label: "Manual" },
   { value: "REFERRAL", label: "Referido" },
-  { value: "SOCIAL_MEDIA", label: "Redes Sociales" },
-  { value: "EVENT", label: "Evento" },
   { value: "OTHER", label: "Otro" },
 ]
 
@@ -26,7 +24,7 @@ interface Lead {
   contactName: string
   email: string | null
   phone: string | null
-  company: string | null
+  businessName: string | null
   position: string | null
   source: string
   interestLevel: string
