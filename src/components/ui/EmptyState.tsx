@@ -1,4 +1,5 @@
 import { ReactNode } from "react"
+import Link from "next/link"
 import { Button } from "./Button"
 
 interface EmptyStateProps {
@@ -7,7 +8,8 @@ interface EmptyStateProps {
   description?: string
   action?: {
     label: string
-    onClick: () => void
+    onClick?: () => void
+    href?: string
   }
 }
 
@@ -20,7 +22,15 @@ export function EmptyState({ icon, title, description, action }: EmptyStateProps
         <p className="text-neutral-600 max-w-md mb-6">{description}</p>
       )}
       {action && (
-        <Button onClick={action.onClick}>{action.label}</Button>
+        <>
+          {action.href ? (
+            <Link href={action.href}>
+              <Button>{action.label}</Button>
+            </Link>
+          ) : action.onClick ? (
+            <Button onClick={action.onClick}>{action.label}</Button>
+          ) : null}
+        </>
       )}
     </div>
   )
