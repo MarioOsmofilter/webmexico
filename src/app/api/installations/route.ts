@@ -21,10 +21,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Si es técnico, solo ver instalaciones asignadas
-    if (
-      session.user.role === "TECHNICIAN" ||
-      session.user.role === "INSTALLER"
-    ) {
+    if (session.user.role === "TECHNICIAN") {
       where.assignedTo = session.user.id
     }
 

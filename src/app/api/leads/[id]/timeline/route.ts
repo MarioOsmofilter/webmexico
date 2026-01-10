@@ -36,6 +36,7 @@ export async function POST(
     // Crear entrada en timeline
     const timelineEntry = await prisma.contactTimeline.create({
       data: {
+        entityType: "lead",
         leadId: params.id,
         actionType: eventType,
         description,

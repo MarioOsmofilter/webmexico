@@ -44,14 +44,6 @@ export async function POST(
         photoType: type || "DURING",
         uploadedBy: session.user.id,
       },
-      include: {
-        uploader: {
-          select: {
-            firstName: true,
-            lastName: true,
-          },
-        },
-      },
     })
 
     return NextResponse.json({ photo }, { status: 201 })
@@ -79,14 +71,6 @@ export async function GET(
         installationId: params.id,
         installation: {
           companyId: session.user.companyId,
-        },
-      },
-      include: {
-        uploader: {
-          select: {
-            firstName: true,
-            lastName: true,
-          },
         },
       },
       orderBy: {

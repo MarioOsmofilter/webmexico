@@ -23,7 +23,7 @@ export async function GET(
         product: {
           select: {
             name: true,
-            reference: true,
+            internalReference: true,
           },
         },
         user: {
@@ -141,7 +141,6 @@ export async function POST(
         quantity,
         reason,
         userId: session.user.id,
-        metadata: {},
       },
       include: {
         product: {

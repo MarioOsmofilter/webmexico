@@ -68,7 +68,6 @@ export async function POST(request: NextRequest) {
         phone: data.phone,
         managerId: data.managerId,
         isActive: data.isActive ?? true,
-        metadata: data.metadata || {},
       },
     })
 

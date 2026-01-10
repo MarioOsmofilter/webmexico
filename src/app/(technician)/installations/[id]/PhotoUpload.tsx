@@ -111,16 +111,9 @@ export function PhotoUpload({
             id={`photo-upload-${photoType}`}
             disabled={uploading}
           />
-          <label htmlFor={`photo-upload-${photoType}`}>
-            <div className="cursor-pointer">
-              <Button
-                as="span"
-                isLoading={uploading}
-                disabled={uploading}
-                className="w-full"
-              >
-                📸 {uploading ? "Subiendo..." : "Tomar/Subir Foto"}
-              </Button>
+          <label htmlFor={`photo-upload-${photoType}`} className="cursor-pointer block">
+            <div className="w-full px-4 py-2 bg-blue-600 text-white text-center rounded-lg hover:bg-blue-700 transition-colors">
+              📸 {uploading ? "Subiendo..." : "Tomar/Subir Foto"}
             </div>
           </label>
         </div>

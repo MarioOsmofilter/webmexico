@@ -32,10 +32,10 @@ export async function POST(
       )
     }
 
-    // Verificar que el lead está en estado WON
-    if (lead.status !== "WON") {
+    // Verificar que el lead está en estado válido para conversión
+    if (lead.status === "LOST" || lead.status === "CONVERTED") {
       return NextResponse.json(
-        { error: "Solo se pueden convertir leads en estado 'Ganado'" },
+        { error: "No se puede convertir un lead perdido o ya convertido" },
         { status: 400 }
       )
     }
@@ -79,6 +79,7 @@ export async function POST(
     // Agregar entrada al timeline del lead
     await prisma.contactTimeline.create({
       data: {
+        entityType: "lead",
         leadId: params.id,
         actionType: "CONVERTED",
         description: `Lead convertido a cliente: ${client.name}`,

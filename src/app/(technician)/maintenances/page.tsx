@@ -172,7 +172,7 @@ export default async function MaintenancesPage() {
                         {maintenance.client.name || maintenance.client.contactName}
                       </h3>
                       <Badge
-                        color={
+                        variant={
                           TYPE_COLORS[
                             maintenance.maintenanceType as keyof typeof TYPE_COLORS
                           ]
@@ -185,7 +185,7 @@ export default async function MaintenancesPage() {
                         }
                       </Badge>
                       <Badge
-                        color={
+                        variant={
                           STATUS_COLORS[
                             maintenance.status as keyof typeof STATUS_COLORS
                           ]
@@ -238,7 +238,7 @@ export default async function MaintenancesPage() {
                         {maintenance.client.name || maintenance.client.contactName}
                       </h3>
                       <Badge
-                        color={
+                        variant={
                           TYPE_COLORS[
                             maintenance.maintenanceType as keyof typeof TYPE_COLORS
                           ]
@@ -251,7 +251,7 @@ export default async function MaintenancesPage() {
                         }
                       </Badge>
                       <Badge
-                        color={
+                        variant={
                           STATUS_COLORS[
                             maintenance.status as keyof typeof STATUS_COLORS
                           ]
@@ -342,7 +342,7 @@ export default async function MaintenancesPage() {
                     </td>
                     <td className="px-4 py-3">
                       <Badge
-                        color={
+                        variant={
                           TYPE_COLORS[
                             maintenance.maintenanceType as keyof typeof TYPE_COLORS
                           ]
@@ -364,7 +364,7 @@ export default async function MaintenancesPage() {
                     </td>
                     <td className="px-4 py-3">
                       <Badge
-                        color={
+                        variant={
                           STATUS_COLORS[
                             maintenance.status as keyof typeof STATUS_COLORS
                           ]

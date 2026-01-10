@@ -123,6 +123,7 @@ export async function POST(request: NextRequest) {
     // Crear entrada en timeline
     await prisma.contactTimeline.create({
       data: {
+        entityType: "lead",
         leadId: lead.id,
         actionType: "CREATED",
         description: `Lead creado por ${session.user.name}`,

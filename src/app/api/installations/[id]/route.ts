@@ -47,7 +47,7 @@ export async function GET(
             product: {
               select: {
                 name: true,
-                reference: true,
+                internalReference: true,
               },
             },
           },

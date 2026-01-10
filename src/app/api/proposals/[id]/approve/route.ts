@@ -78,6 +78,7 @@ export async function POST(
     if (proposal.leadId) {
       await prisma.contactTimeline.create({
         data: {
+          entityType: "lead",
           leadId: proposal.leadId,
           userId: session.user.id,
           actionType: "OTHER",
@@ -163,6 +164,7 @@ export async function DELETE(
     if (proposal.leadId) {
       await prisma.contactTimeline.create({
         data: {
+          entityType: "lead",
           leadId: proposal.leadId,
           userId: session.user.id,
           actionType: "OTHER",

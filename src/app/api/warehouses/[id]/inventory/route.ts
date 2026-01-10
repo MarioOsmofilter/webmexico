@@ -130,7 +130,6 @@ export async function POST(
         quantity,
         reason: "Stock inicial",
         userId: session.user.id,
-        metadata: {},
       },
     })
 

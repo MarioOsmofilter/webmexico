@@ -34,7 +34,6 @@ export const authConfig: NextAuthConfig = {
           },
           include: {
             company: true,
-            permissions: true,
           }
         })
 

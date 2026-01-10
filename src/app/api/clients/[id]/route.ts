@@ -116,7 +116,6 @@ export async function PUT(
         city: data.city,
         state: data.state,
         postalCode: data.postalCode,
-        country: data.country,
         assignedToUserId: data.assignedTo,
         notes: data.notes,
         metadata: data.metadata,

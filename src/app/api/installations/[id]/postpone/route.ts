@@ -56,7 +56,7 @@ export async function POST(
 
     // Liberar materiales reservados (devolver a stock)
     for (const material of installation.materials) {
-      if (material.isReserved && !material.isUsed) {
+      if (material.isReserved && !material.isUsed && material.warehouseId) {
         await prisma.inventory.updateMany({
           where: {
             productId: material.productId,

@@ -183,6 +183,7 @@ export async function POST(request: NextRequest) {
     if (data.leadId) {
       await prisma.contactTimeline.create({
         data: {
+          entityType: "lead",
           leadId: data.leadId,
           userId: session.user.id,
           actionType: "PROPOSAL_SENT",

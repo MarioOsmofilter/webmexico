@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Verificar contraseña actual
-    const isPasswordValid = await bcrypt.compare(currentPassword, user.passwordHash)
+    const isPasswordValid = await bcrypt.compare(currentPassword, user.password)
     if (!isPasswordValid) {
       return NextResponse.json(
         { error: "La contraseña actual es incorrecta" },
@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
     await prisma.user.update({
       where: { id: user.id },
       data: {
-        passwordHash: newPasswordHash,
+        password: newPasswordHash,
         forcePasswordChange: false,
       },
     })

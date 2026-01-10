@@ -83,9 +83,6 @@ export default async function ProposalDetailPage({
             },
           },
         },
-        orderBy: {
-          createdAt: "asc",
-        },
       },
       template: {
         select: {

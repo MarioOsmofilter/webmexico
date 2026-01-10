@@ -93,6 +93,7 @@ export async function GET(
       if (proposal.leadId) {
         await prisma.contactTimeline.create({
           data: {
+            entityType: "lead",
             leadId: proposal.leadId,
             userId: session.user.id,
             actionType: "PROPOSAL_SENT",
@@ -114,7 +115,7 @@ export async function GET(
     })
 
     // Devolver PDF
-    return new NextResponse(pdfBuffer, {
+    return new NextResponse(pdfBuffer as unknown as BodyInit, {
       headers: {
         "Content-Type": "application/pdf",
         "Content-Disposition": `attachment; filename="Propuesta-${proposal.proposalNumber}.pdf"`,

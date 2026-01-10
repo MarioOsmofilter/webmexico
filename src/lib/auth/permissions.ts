@@ -140,11 +140,11 @@ export function hasModuleAccess(role: UserRole, module: Module): boolean {
 
 // Verificar si un rol es director
 export function isDirector(role: UserRole): boolean {
-  return [
-    UserRole.DIRECTOR_SALES,
-    UserRole.DIRECTOR_INSTALLATIONS,
-    UserRole.DIRECTOR_MARKETING,
-  ].includes(role)
+  return (
+    role === "DIRECTOR_SALES" ||
+    role === "DIRECTOR_INSTALLATIONS" ||
+    role === "DIRECTOR_MARKETING"
+  )
 }
 
 // Verificar si un rol puede ver todos los datos de su empresa

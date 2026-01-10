@@ -120,7 +120,6 @@ export async function POST(request: NextRequest) {
         city: data.city,
         state: data.state,
         postalCode: data.postalCode,
-        country: data.country || "España",
         assignedToUserId: data.assignedTo || session.user.id,
         notes: data.notes,
         metadata: data.metadata || {},

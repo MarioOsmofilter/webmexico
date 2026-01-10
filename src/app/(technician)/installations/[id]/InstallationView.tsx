@@ -89,7 +89,7 @@ export function InstallationView({
             </p>
           </div>
           <Badge
-            color={
+            variant={
               installation.status === "COMPLETED"
                 ? "green"
                 : installation.status === "IN_PROGRESS"

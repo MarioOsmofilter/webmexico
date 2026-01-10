@@ -122,6 +122,7 @@ export async function PUT(
     // Crear entrada en timeline
     await prisma.contactTimeline.create({
       data: {
+        entityType: "lead",
         leadId: lead.id,
         actionType: "STATUS_CHANGED",
         description: `Lead actualizado por ${session.user.name}`,
