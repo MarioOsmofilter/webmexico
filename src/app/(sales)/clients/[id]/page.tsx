@@ -228,7 +228,6 @@ export default async function ClientDetailPage({
                       client.city,
                       client.state,
                       client.postalCode,
-                      client.country,
                     ]
                       .filter(Boolean)
                       .join(", ")}

@@ -9,12 +9,13 @@ import { formatCurrency } from "@/lib/utils/format"
 interface Product {
   id: string
   name: string
-  reference: string | null
+  internalReference: string | null
+  basePrice: any
   prices: {
-    basePrice: any
+    salePrice1: any | null
+    rentalPrice1: any | null
+    rentalPrice12: any | null
     minPriceThreshold: any | null
-    rentalPriceDaily: any | null
-    rentalPriceMonthly: any | null
   } | null
   images: { url: string }[]
 }
@@ -86,9 +87,9 @@ export function NewProposalForm({
     // Determinar precio según tipo de pago
     let unitPrice = 0
     if (paymentType === "SALE") {
-      unitPrice = Number(product.prices?.basePrice || 0)
+      unitPrice = Number(product.basePrice || 0)
     } else {
-      unitPrice = Number(product.prices?.rentalPriceMonthly || 0)
+      unitPrice = Number(product.prices?.rentalPrice12 || 0)
     }
 
     const newItem: ProposalItem = {
@@ -381,12 +382,12 @@ export function NewProposalForm({
                   {products.map((product) => (
                     <option key={product.id} value={product.id}>
                       {product.name}
-                      {product.reference && ` (${product.reference})`} -{" "}
+                      {product.internalReference && ` (${product.internalReference})`} -{" "}
                       {formatCurrency(
                         Number(
                           paymentType === "SALE"
-                            ? product.prices?.basePrice || 0
-                            : product.prices?.rentalPriceMonthly || 0
+                            ? product.basePrice || 0
+                            : product.prices?.rentalPrice12 || 0
                         )
                       )}
                     </option>

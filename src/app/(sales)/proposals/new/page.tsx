@@ -73,7 +73,6 @@ export default async function NewProposalPage({
   const templates = await prisma.proposalTemplate.findMany({
     where: {
       companyId: session.user.companyId,
-      isActive: true,
     },
     orderBy: {
       isDefault: "desc",

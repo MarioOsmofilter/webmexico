@@ -44,7 +44,7 @@ export default async function InstallationsPage() {
           product: {
             select: {
               name: true,
-              reference: true,
+              internalReference: true,
             },
           },
         },

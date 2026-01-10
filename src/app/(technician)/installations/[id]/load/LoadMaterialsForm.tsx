@@ -12,7 +12,7 @@ interface Material {
   isLoaded: boolean
   product: {
     name: string
-    reference: string | null
+    internalReference: string | null
     images: { url: string }[]
   }
   warehouse: {
@@ -192,9 +192,9 @@ export function LoadMaterialsForm({ installation }: LoadMaterialsFormProps) {
                     <h3 className="font-medium text-gray-900">
                       {material.product.name}
                     </h3>
-                    {material.product.reference && (
+                    {material.product.internalReference && (
                       <p className="text-sm text-gray-500">
-                        Ref: {material.product.reference}
+                        Ref: {material.product.internalReference}
                       </p>
                     )}
                     <div className="flex items-center gap-4 mt-1">
