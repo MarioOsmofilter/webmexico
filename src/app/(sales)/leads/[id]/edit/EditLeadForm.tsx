@@ -27,7 +27,7 @@ interface Lead {
   businessName: string | null
   position: string | null
   source: string
-  interestLevel: string
+  interestLevel: string | null
   estimatedValue: any
   address: string | null
   city: string | null
@@ -245,9 +245,10 @@ export function EditLeadForm({ lead, availableUsers }: EditLeadFormProps) {
               <select
                 id="interestLevel"
                 name="interestLevel"
-                defaultValue={lead.interestLevel}
+                defaultValue={lead.interestLevel || ""}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
+                <option value="">Seleccionar...</option>
                 {INTEREST_LEVELS.map((level) => (
                   <option key={level.value} value={level.value}>
                     {level.label}
