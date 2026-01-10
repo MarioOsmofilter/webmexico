@@ -118,7 +118,6 @@ export async function PUT(
         postalCode: data.postalCode,
         assignedToUserId: data.assignedTo,
         notes: data.notes,
-        metadata: data.metadata,
       },
       include: {
         assignedTo: {

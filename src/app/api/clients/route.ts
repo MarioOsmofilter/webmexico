@@ -122,7 +122,6 @@ export async function POST(request: NextRequest) {
         postalCode: data.postalCode,
         assignedToUserId: data.assignedTo || session.user.id,
         notes: data.notes,
-        metadata: data.metadata || {},
       },
       include: {
         assignedTo: {

@@ -91,10 +91,10 @@ export function InstallationView({
           <Badge
             variant={
               installation.status === "COMPLETED"
-                ? "green"
+                ? "success"
                 : installation.status === "IN_PROGRESS"
-                ? "yellow"
-                : "blue"
+                ? "warning"
+                : "primary"
             }
           >
             {installation.status === "COMPLETED"

@@ -11,10 +11,10 @@ const TYPE_LABELS: Record<string, string> = {
   EMERGENCY: "Emergencia",
 }
 
-const TYPE_COLORS: Record<string, string> = {
-  PERIODIC: "blue",
-  INCIDENT: "orange",
-  EMERGENCY: "red",
+const TYPE_COLORS: Record<string, "primary" | "warning" | "error" | "success" | "neutral"> = {
+  PERIODIC: "primary",
+  INCIDENT: "warning",
+  EMERGENCY: "error",
 }
 
 const STATUS_LABELS: Record<string, string> = {
@@ -24,11 +24,11 @@ const STATUS_LABELS: Record<string, string> = {
   CANCELLED: "Cancelado",
 }
 
-const STATUS_COLORS: Record<string, string> = {
-  SCHEDULED: "blue",
-  IN_PROGRESS: "yellow",
-  COMPLETED: "green",
-  CANCELLED: "red",
+const STATUS_COLORS: Record<string, "primary" | "warning" | "error" | "success" | "neutral"> = {
+  SCHEDULED: "primary",
+  IN_PROGRESS: "warning",
+  COMPLETED: "success",
+  CANCELLED: "error",
 }
 
 export default async function MaintenancesPage() {
