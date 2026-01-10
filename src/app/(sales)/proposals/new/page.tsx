@@ -25,7 +25,7 @@ export default async function NewProposalPage({
     select: {
       id: true,
       contactName: true,
-      company: true,
+      businessName: true,
       email: true,
     },
     orderBy: {

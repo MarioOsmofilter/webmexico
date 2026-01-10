@@ -14,17 +14,15 @@ const STATUS_MAP = {
   QUALIFIED: { label: "Calificado", variant: "primary" as const },
   PROPOSAL_SENT: { label: "Propuesta Enviada", variant: "primary" as const },
   NEGOTIATION: { label: "Negociación", variant: "warning" as const },
-  WON: { label: "Ganado", variant: "success" as const },
+  CONVERTED: { label: "Convertido", variant: "success" as const },
   LOST: { label: "Perdido", variant: "error" as const },
 }
 
 const SOURCE_MAP = {
   WEB: "Web",
-  PHONE: "Teléfono",
-  EMAIL: "Email",
+  TELEMARKETING: "Telemarketing",
+  MANUAL: "Manual",
   REFERRAL: "Referido",
-  SOCIAL_MEDIA: "Redes Sociales",
-  EVENT: "Evento",
   OTHER: "Otro",
 }
 
@@ -37,8 +35,8 @@ const INTEREST_LEVEL_MAP = {
 // Mapeo de estados de propuestas
 const PROPOSAL_STATUS_MAP = {
   DRAFT: { label: "Borrador", variant: "neutral" as const },
-  PENDING_APPROVAL: { label: "Pendiente Aprobación", variant: "warning" as const },
   SENT: { label: "Enviada", variant: "primary" as const },
+  VIEWED: { label: "Vista", variant: "primary" as const },
   ACCEPTED: { label: "Aceptada", variant: "success" as const },
   REJECTED: { label: "Rechazada", variant: "error" as const },
   EXPIRED: { label: "Expirada", variant: "neutral" as const },
@@ -121,8 +119,8 @@ export default async function LeadDetailPage({
             <h1 className="text-2xl font-bold text-gray-900">
               {lead.contactName}
             </h1>
-            {lead.company && (
-              <p className="text-gray-500 mt-1">{lead.company}</p>
+            {lead.businessName && (
+              <p className="text-gray-500 mt-1">{lead.businessName}</p>
             )}
           </div>
           <div className="flex items-center gap-3">
@@ -175,10 +173,10 @@ export default async function LeadDetailPage({
                 </div>
               )}
 
-              {lead.company && (
+              {lead.businessName && (
                 <div>
                   <p className="text-sm text-gray-500 mb-1">Empresa</p>
-                  <p className="text-gray-900">{lead.company}</p>
+                  <p className="text-gray-900">{lead.businessName}</p>
                 </div>
               )}
             </div>

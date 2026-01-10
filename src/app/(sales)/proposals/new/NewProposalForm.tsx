@@ -28,7 +28,7 @@ interface ProposalItem {
 }
 
 interface NewProposalFormProps {
-  leads: { id: string; contactName: string; company: string | null; email: string | null }[]
+  leads: { id: string; contactName: string; businessName: string | null; email: string | null }[]
   clients: { id: string; name: string; email: string | null }[]
   products: Product[]
   templates: { id: string; name: string; isDefault: boolean }[]
@@ -173,7 +173,7 @@ export function NewProposalForm({
         productId: item.productId,
         quantity: item.quantity,
         unitPrice: item.unitPrice,
-        discount: item.discount,
+        discountPercent: item.discount,
       })),
     }
 
@@ -242,7 +242,7 @@ export function NewProposalForm({
                     {leads.map((lead) => (
                       <option key={lead.id} value={lead.id}>
                         {lead.contactName}
-                        {lead.company && ` - ${lead.company}`}
+                        {lead.businessName && ` - ${lead.businessName}`}
                       </option>
                     ))}
                   </select>

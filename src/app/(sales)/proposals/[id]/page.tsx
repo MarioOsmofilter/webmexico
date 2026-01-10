@@ -9,8 +9,8 @@ import { ProposalActions } from "./ProposalActions"
 // Mapeo de estados
 const STATUS_MAP = {
   DRAFT: { label: "Borrador", variant: "neutral" as const },
-  PENDING_APPROVAL: { label: "Pendiente Aprobación", variant: "warning" as const },
   SENT: { label: "Enviada", variant: "primary" as const },
+  VIEWED: { label: "Vista", variant: "primary" as const },
   ACCEPTED: { label: "Aceptada", variant: "success" as const },
   REJECTED: { label: "Rechazada", variant: "error" as const },
   EXPIRED: { label: "Expirada", variant: "neutral" as const },
@@ -114,7 +114,7 @@ export default async function ProposalDetailPage({
   )
   const totalDiscount = proposal.items.reduce(
     (sum, item) =>
-      sum + item.quantity * Number(item.unitPrice) * (Number(item.discount) / 100),
+      sum + item.quantity * Number(item.unitPrice) * (Number(item.discountPercent) / 100),
     0
   )
 
@@ -273,7 +273,7 @@ export default async function ProposalDetailPage({
                         </div>
                         <div>
                           <p className="text-gray-500">Descuento</p>
-                          <p className="font-medium">{item.discount}%</p>
+                          <p className="font-medium">{item.discountPercent}%</p>
                         </div>
                         <div>
                           <p className="text-gray-500">Subtotal</p>
@@ -281,7 +281,7 @@ export default async function ProposalDetailPage({
                             {formatCurrency(
                               item.quantity *
                                 Number(item.unitPrice) *
-                                (1 - Number(item.discount) / 100)
+                                (1 - Number(item.discountPercent) / 100)
                             )}
                           </p>
                         </div>

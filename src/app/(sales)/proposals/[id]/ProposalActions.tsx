@@ -173,7 +173,7 @@ export function ProposalActions({ proposal, userRole }: ProposalActionsProps) {
             {isDirector &&
               proposal.requiresApproval &&
               !proposal.approvedBy &&
-              proposal.status === "PENDING_APPROVAL" && (
+              proposal.status === "DRAFT" && (
                 <>
                   <button
                     onClick={handleApprove}
@@ -193,10 +193,9 @@ export function ProposalActions({ proposal, userRole }: ProposalActionsProps) {
                 </>
               )}
 
-            {/* Enviar (desde borrador o aprobada) */}
-            {(proposal.status === "DRAFT" ||
-              (proposal.status === "PENDING_APPROVAL" &&
-                proposal.approvedBy)) && (
+            {/* Enviar (desde borrador aprobado o sin necesidad de aprobación) */}
+            {proposal.status === "DRAFT" &&
+              (!proposal.requiresApproval || proposal.approvedBy) && (
               <button
                 onClick={handleSend}
                 className="block w-full text-left px-4 py-2 text-sm text-blue-700 hover:bg-blue-50"

@@ -9,7 +9,7 @@ import { ClientActions } from "./ClientActions"
 const STATUS_MAP = {
   ACTIVE: { label: "Activo", variant: "success" as const },
   INACTIVE: { label: "Inactivo", variant: "neutral" as const },
-  SUSPENDED: { label: "Suspendido", variant: "error" as const },
+  VIP: { label: "VIP", variant: "primary" as const },
 }
 
 const TYPE_MAP = {
@@ -19,8 +19,8 @@ const TYPE_MAP = {
 
 const PROPOSAL_STATUS_MAP = {
   DRAFT: { label: "Borrador", variant: "neutral" as const },
-  PENDING_APPROVAL: { label: "Pendiente", variant: "warning" as const },
   SENT: { label: "Enviada", variant: "primary" as const },
+  VIEWED: { label: "Vista", variant: "primary" as const },
   ACCEPTED: { label: "Aceptada", variant: "success" as const },
   REJECTED: { label: "Rechazada", variant: "error" as const },
   EXPIRED: { label: "Expirada", variant: "neutral" as const },

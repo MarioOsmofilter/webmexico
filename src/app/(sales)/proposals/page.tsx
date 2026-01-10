@@ -9,8 +9,8 @@ import { EmptyState } from "@/components/ui/EmptyState"
 // Mapeo de estados
 const STATUS_MAP = {
   DRAFT: { label: "Borrador", variant: "neutral" as const },
-  PENDING_APPROVAL: { label: "Pendiente Aprobación", variant: "warning" as const },
   SENT: { label: "Enviada", variant: "primary" as const },
+  VIEWED: { label: "Vista", variant: "primary" as const },
   ACCEPTED: { label: "Aceptada", variant: "success" as const },
   REJECTED: { label: "Rechazada", variant: "error" as const },
   EXPIRED: { label: "Expirada", variant: "neutral" as const },
@@ -146,15 +146,15 @@ export default async function ProposalsPage({
           </p>
         </div>
         <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-          <p className="text-sm text-gray-500">Pendientes</p>
-          <p className="text-2xl font-bold text-yellow-600">
-            {statsByStatus.PENDING_APPROVAL?.count || 0}
-          </p>
-        </div>
-        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
           <p className="text-sm text-gray-500">Enviadas</p>
           <p className="text-2xl font-bold text-blue-600">
             {statsByStatus.SENT?.count || 0}
+          </p>
+        </div>
+        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+          <p className="text-sm text-gray-500">Vistas</p>
+          <p className="text-2xl font-bold text-purple-600">
+            {statsByStatus.VIEWED?.count || 0}
           </p>
         </div>
         <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">

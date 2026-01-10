@@ -18,7 +18,7 @@ const STATUS_OPTIONS = [
   { value: "QUALIFIED", label: "Calificado" },
   { value: "PROPOSAL_SENT", label: "Propuesta Enviada" },
   { value: "NEGOTIATION", label: "Negociación" },
-  { value: "WON", label: "Ganado" },
+  { value: "CONVERTED", label: "Convertido" },
   { value: "LOST", label: "Perdido" },
 ]
 
@@ -156,7 +156,7 @@ export function LeadActions({ lead }: LeadActionsProps) {
             </div>
 
             {/* Convertir a Cliente */}
-            {!lead.convertedToClient && lead.status === "WON" && (
+            {!lead.convertedToClient && lead.status === "CONVERTED" && (
               <div className="border-t border-gray-200">
                 <button
                   onClick={handleConvertToClient}

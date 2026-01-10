@@ -13,18 +13,16 @@ const STATUS_MAP = {
   QUALIFIED: { label: "Calificado", variant: "primary" as const },
   PROPOSAL_SENT: { label: "Propuesta Enviada", variant: "primary" as const },
   NEGOTIATION: { label: "Negociación", variant: "warning" as const },
-  WON: { label: "Ganado", variant: "success" as const },
+  CONVERTED: { label: "Convertido", variant: "success" as const },
   LOST: { label: "Perdido", variant: "error" as const },
 }
 
 // Mapeo de fuentes
 const SOURCE_MAP = {
   WEB: "Web",
-  PHONE: "Teléfono",
-  EMAIL: "Email",
+  TELEMARKETING: "Telemarketing",
+  MANUAL: "Manual",
   REFERRAL: "Referido",
-  SOCIAL_MEDIA: "Redes Sociales",
-  EVENT: "Evento",
   OTHER: "Otro",
 }
 
@@ -162,9 +160,9 @@ export default async function LeadsPage({
           </p>
         </div>
         <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-          <p className="text-sm text-gray-500">Ganados</p>
+          <p className="text-sm text-gray-500">Convertidos</p>
           <p className="text-2xl font-bold text-green-600">
-            {statsByStatus.WON || 0}
+            {statsByStatus.CONVERTED || 0}
           </p>
         </div>
       </div>
@@ -325,7 +323,7 @@ export default async function LeadsPage({
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900">
-                        {lead.company || "-"}
+                        {lead.businessName || "-"}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">

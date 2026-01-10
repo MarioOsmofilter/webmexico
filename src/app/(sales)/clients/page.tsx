@@ -10,7 +10,7 @@ import { EmptyState } from "@/components/ui/EmptyState"
 const STATUS_MAP = {
   ACTIVE: { label: "Activo", variant: "success" as const },
   INACTIVE: { label: "Inactivo", variant: "neutral" as const },
-  SUSPENDED: { label: "Suspendido", variant: "error" as const },
+  VIP: { label: "VIP", variant: "primary" as const },
 }
 
 const TYPE_MAP = {
@@ -126,7 +126,7 @@ export default async function ClientsPage({
       </div>
 
       {/* Estadísticas rápidas */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
           <p className="text-sm text-gray-500">Total</p>
           <p className="text-2xl font-bold text-gray-900">
@@ -140,15 +140,9 @@ export default async function ClientsPage({
           </p>
         </div>
         <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-          <p className="text-sm text-gray-500">Inactivos</p>
-          <p className="text-2xl font-bold text-gray-600">
-            {statsByStatus.INACTIVE || 0}
-          </p>
-        </div>
-        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-          <p className="text-sm text-gray-500">Suspendidos</p>
-          <p className="text-2xl font-bold text-red-600">
-            {statsByStatus.SUSPENDED || 0}
+          <p className="text-sm text-gray-500">VIP</p>
+          <p className="text-2xl font-bold text-blue-600">
+            {statsByStatus.VIP || 0}
           </p>
         </div>
       </div>
