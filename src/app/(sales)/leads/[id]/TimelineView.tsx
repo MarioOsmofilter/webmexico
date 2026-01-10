@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/Button"
 
 interface TimelineEntry {
   id: string
-  eventType: string
+  actionType: string
   description: string
   createdAt: Date
 }
@@ -155,13 +155,13 @@ export function TimelineView({ timeline, leadId }: TimelineViewProps) {
 
               <div className="flex gap-3">
                 <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-sm">
-                  {EVENT_TYPE_ICONS[entry.eventType] || "📌"}
+                  {EVENT_TYPE_ICONS[entry.actionType] || "📌"}
                 </div>
 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between gap-2">
                     <p className="text-sm font-medium text-gray-900">
-                      {EVENT_TYPE_LABELS[entry.eventType] || entry.eventType}
+                      {EVENT_TYPE_LABELS[entry.actionType] || entry.actionType}
                     </p>
                     <p className="text-xs text-gray-500 whitespace-nowrap">
                       {formatDate(entry.createdAt)}
