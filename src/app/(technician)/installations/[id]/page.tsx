@@ -17,7 +17,7 @@ export default async function InstallationDetailPage({
     where: {
       id: params.id,
       companyId: session.user.companyId,
-      assignedTo: session.user.id,
+      assignedToUserId: session.user.id,
     },
     include: {
       client: true,

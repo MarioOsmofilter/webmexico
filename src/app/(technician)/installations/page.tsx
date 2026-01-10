@@ -24,7 +24,7 @@ export default async function InstallationsPage() {
   const installations = await prisma.installation.findMany({
     where: {
       companyId: session.user.companyId,
-      assignedTo: session.user.id,
+      assignedToUserId: session.user.id,
       status: {
         in: ["SCHEDULED", "IN_PROGRESS", "POSTPONED"],
       },

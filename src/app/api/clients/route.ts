@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
     if (
       !["SUPERADMIN", "ADMIN", "DIRECTOR_SALES"].includes(session.user.role)
     ) {
-      where.OR = [{ assignedTo: session.user.id }, { assignedTo: null }]
+      where.OR = [{ assignedToUserId: session.user.id }, { assignedToUserId: null }]
     }
 
     if (status) {

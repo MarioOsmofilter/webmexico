@@ -105,8 +105,8 @@ export default async function LeadsPage({
         ? {}
         : {
             OR: [
-              { assignedTo: session.user.id },
-              { assignedTo: null },
+              { assignedToUserId: session.user.id },
+              { assignedToUserId: null },
             ],
           }),
     },

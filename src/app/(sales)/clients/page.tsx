@@ -43,7 +43,7 @@ export default async function ClientsPage({
 
   // Si no es director/admin, solo ver clientes asignados
   if (!["SUPERADMIN", "ADMIN", "DIRECTOR_SALES"].includes(session.user.role)) {
-    where.OR = [{ assignedTo: session.user.id }, { assignedTo: null }]
+    where.OR = [{ assignedToUserId: session.user.id }, { assignedToUserId: null }]
   }
 
   if (status) {
@@ -95,7 +95,7 @@ export default async function ClientsPage({
       ...(["SUPERADMIN", "ADMIN", "DIRECTOR_SALES"].includes(session.user.role)
         ? {}
         : {
-            OR: [{ assignedTo: session.user.id }, { assignedTo: null }],
+            OR: [{ assignedToUserId: session.user.id }, { assignedToUserId: null }],
           }),
     },
     _count: true,
