@@ -1,13 +1,16 @@
 "use client"
 
-import { useState } from "react"
+import { useState, Suspense } from "react"
 import { signIn } from "next-auth/react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { loginSchema, type LoginInput } from "@/lib/utils/validators"
 
-export default function LoginPage() {
+// Forzar renderizado dinámico para evitar error de prerendering con useSearchParams
+export const dynamic = 'force-dynamic'
+
+function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const callbackUrl = searchParams.get("callbackUrl") || "/dashboard"
@@ -150,5 +153,17 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center">
+        <div className="text-white text-lg">Cargando...</div>
+      </div>
+    }>
+      <LoginForm />
+    </Suspense>
   )
 }
