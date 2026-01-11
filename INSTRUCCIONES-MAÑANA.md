@@ -36,7 +36,8 @@ pm2 startup
 1. **Error de Decimal en proposals**: Convertido a Number ✅
 2. **Error de adapter NextAuth**: Agregado @ts-ignore para conflicto de versiones ✅
 3. **Error de item.notes**: Comentado temporalmente (el schema tiene el campo pero el cliente Prisma no se regeneró) ✅
-4. **Todas las correcciones anteriores**: Schema actualizado con relaciones template y proposals ✅
+4. **Error de lógica en Ver Lead**: Corregida condición imposible (proposal.lead && !proposal.lead) ✅
+5. **Todas las correcciones anteriores**: Schema actualizado con relaciones template y proposals ✅
 
 ## ⚠️ Notas importantes:
 
