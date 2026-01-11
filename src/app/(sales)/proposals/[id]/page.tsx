@@ -270,7 +270,7 @@ export default async function ProposalDetailPage({
                         </div>
                         <div>
                           <p className="text-gray-500">Descuento</p>
-                          <p className="font-medium">{item.discountPercent}%</p>
+                          <p className="font-medium">{Number(item.discountPercent)}%</p>
                         </div>
                         <div>
                           <p className="text-gray-500">Subtotal</p>
