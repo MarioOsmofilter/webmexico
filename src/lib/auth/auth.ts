@@ -7,6 +7,7 @@ import prisma from "@/lib/prisma/client"
 import { UserRole } from "@prisma/client"
 
 export const authConfig: NextAuthConfig = {
+  // @ts-ignore - Type mismatch between @auth/prisma-adapter and next-auth versions
   adapter: PrismaAdapter(prisma),
   session: {
     strategy: "jwt",

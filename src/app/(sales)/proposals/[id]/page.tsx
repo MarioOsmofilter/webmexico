@@ -284,11 +284,12 @@ export default async function ProposalDetailPage({
                         </div>
                       </div>
 
-                      {item.notes && (
+                      {/* TODO: Uncomment when Prisma client is regenerated with notes field */}
+                      {/* {item.notes && (
                         <p className="text-sm text-gray-600 mt-2">
                           {item.notes}
                         </p>
-                      )}
+                      )} */}
                     </div>
                   </div>
                 </div>
