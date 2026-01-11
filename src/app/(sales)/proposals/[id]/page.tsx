@@ -473,7 +473,7 @@ export default async function ProposalDetailPage({
                 </Link>
               )}
 
-              {proposal.lead && !proposal.lead && (
+              {proposal.lead && (
                 <Link
                   href={`/sales/leads/${proposal.lead.id}`}
                   className="block w-full px-4 py-2 border border-gray-300 text-gray-700 text-center rounded-lg hover:bg-gray-50 transition-colors"
