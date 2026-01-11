@@ -4,19 +4,13 @@ import CredentialsProvider from "next-auth/providers/credentials"
 import bcrypt from "bcryptjs"
 import { PrismaAdapter } from "@auth/prisma-adapter"
 import prisma from "@/lib/prisma/client"
-import { UserRole } from "@prisma/client"
+import { authConfig as baseConfig } from "./auth.config"
 
-export const authConfig: NextAuthConfig = {
+// Configuración completa de NextAuth con Prisma (para uso en servidor, no en middleware)
+const authConfigServer: NextAuthConfig = {
+  ...baseConfig,
   // @ts-ignore - Type mismatch between @auth/prisma-adapter and next-auth versions
   adapter: PrismaAdapter(prisma),
-  session: {
-    strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60, // 30 días
-  },
-  pages: {
-    signIn: "/login",
-    error: "/login",
-  },
   providers: [
     CredentialsProvider({
       name: "credentials",
@@ -76,28 +70,6 @@ export const authConfig: NextAuthConfig = {
       }
     })
   ],
-  callbacks: {
-    async jwt({ token, user }) {
-      if (user) {
-        token.id = user.id
-        token.role = user.role
-        token.companyId = user.companyId
-        token.companySlug = user.companySlug
-        token.forcePasswordChange = user.forcePasswordChange
-      }
-      return token
-    },
-    async session({ session, token }) {
-      if (token && session.user) {
-        session.user.id = token.id as string
-        session.user.role = token.role as UserRole
-        session.user.companyId = token.companyId as string
-        session.user.companySlug = token.companySlug as string
-        session.user.forcePasswordChange = token.forcePasswordChange as boolean
-      }
-      return session
-    },
-  },
 }
 
-export const { handlers, auth, signIn, signOut } = NextAuth(authConfig)
+export const { handlers, auth, signIn, signOut } = NextAuth(authConfigServer)

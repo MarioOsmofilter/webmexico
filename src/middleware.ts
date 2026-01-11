@@ -1,19 +1,6 @@
-import { NextResponse } from "next/server"
-import type { NextRequest } from "next/server"
-import { auth } from "@/lib/auth/auth"
-import { UserRole } from "@prisma/client"
-
-// Rutas públicas que no requieren autenticación
-const publicRoutes = [
-  "/",
-  "/login",
-  "/api/auth",
-  "/api/public",
-  "/manifest.json",
-  "/_next",
-  "/favicon.ico",
-  "/icon-",
-]
+import NextAuth from "next-auth"
+import { authConfig } from "@/lib/auth/auth.config"
+import { UserRole } from "@/lib/prisma-enums"
 
 // Rutas que requieren roles específicos
 const roleBasedRoutes: Record<string, UserRole[]> = {
@@ -44,27 +31,39 @@ const roleBasedRoutes: Record<string, UserRole[]> = {
   ],
 }
 
-export default async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl
+const { auth } = NextAuth(authConfig)
+
+export default auth((req) => {
+  const { pathname } = req.nextUrl
+  const session = req.auth
+
+  // Rutas públicas que no requieren autenticación
+  const publicRoutes = [
+    "/",
+    "/login",
+    "/api/auth",
+    "/api/public",
+    "/manifest.json",
+    "/_next",
+    "/favicon.ico",
+    "/icon-",
+  ]
 
   // Permitir rutas públicas
   if (publicRoutes.some(route => pathname.startsWith(route))) {
-    return NextResponse.next()
+    return
   }
-
-  // Obtener sesión
-  const session = await auth()
 
   // Si no hay sesión, redirigir a login
   if (!session) {
-    const url = new URL("/login", request.url)
+    const url = new URL("/login", req.url)
     url.searchParams.set("callbackUrl", pathname)
-    return NextResponse.redirect(url)
+    return Response.redirect(url)
   }
 
   // Si el usuario debe cambiar contraseña y no está en esa página
   if (session.user.forcePasswordChange && pathname !== "/change-password") {
-    return NextResponse.redirect(new URL("/change-password", request.url))
+    return Response.redirect(new URL("/change-password", req.url))
   }
 
   // Verificar permisos basados en rol
@@ -73,13 +72,11 @@ export default async function middleware(request: NextRequest) {
       if (!allowedRoles.includes(session.user.role)) {
         // Redirigir a su dashboard correspondiente
         const dashboardRoute = getDashboardRouteByRole(session.user.role)
-        return NextResponse.redirect(new URL(dashboardRoute, request.url))
+        return Response.redirect(new URL(dashboardRoute, req.url))
       }
     }
   }
-
-  return NextResponse.next()
-}
+})
 
 function getDashboardRouteByRole(role: UserRole): string {
   switch (role) {

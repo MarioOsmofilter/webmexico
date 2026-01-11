@@ -1,0 +1,69 @@
+// Enums exportados desde Prisma para uso en Edge Runtime (middleware)
+// Estos deben mantenerse sincronizados con el schema de Prisma
+
+export enum UserRole {
+  SUPERADMIN = 'SUPERADMIN',
+  ADMIN = 'ADMIN',
+  DIRECTOR_SALES = 'DIRECTOR_SALES',
+  DIRECTOR_INSTALLATIONS = 'DIRECTOR_INSTALLATIONS',
+  DIRECTOR_MARKETING = 'DIRECTOR_MARKETING',
+  SALES = 'SALES',
+  TECHNICIAN = 'TECHNICIAN',
+  MARKETING = 'MARKETING',
+  WAREHOUSE = 'WAREHOUSE',
+  CUSTOM = 'CUSTOM',
+}
+
+export enum UserStatus {
+  ACTIVE = 'ACTIVE',
+  INACTIVE = 'INACTIVE',
+  SUSPENDED = 'SUSPENDED',
+}
+
+export enum CompanyStatus {
+  ACTIVE = 'ACTIVE',
+  INACTIVE = 'INACTIVE',
+  TRIAL = 'TRIAL',
+  SUSPENDED = 'SUSPENDED',
+}
+
+export enum ProductStatus {
+  ACTIVE = 'ACTIVE',
+  INACTIVE = 'INACTIVE',
+  DISCONTINUED = 'DISCONTINUED',
+}
+
+export enum LeadStatus {
+  NEW = 'NEW',
+  CONTACTED = 'CONTACTED',
+  QUALIFIED = 'QUALIFIED',
+  PROPOSAL_SENT = 'PROPOSAL_SENT',
+  NEGOTIATION = 'NEGOTIATION',
+  CONVERTED = 'CONVERTED',
+  LOST = 'LOST',
+}
+
+export enum ProposalStatus {
+  DRAFT = 'DRAFT',
+  SENT = 'SENT',
+  VIEWED = 'VIEWED',
+  ACCEPTED = 'ACCEPTED',
+  REJECTED = 'REJECTED',
+  EXPIRED = 'EXPIRED',
+}
+
+export enum InstallationStatus {
+  SCHEDULED = 'SCHEDULED',
+  IN_PROGRESS = 'IN_PROGRESS',
+  COMPLETED = 'COMPLETED',
+  CANCELLED = 'CANCELLED',
+  POSTPONED = 'POSTPONED',
+}
+
+export enum SaleStatus {
+  PENDING = 'PENDING',
+  CONFIRMED = 'CONFIRMED',
+  IN_PROGRESS = 'IN_PROGRESS',
+  COMPLETED = 'COMPLETED',
+  CANCELLED = 'CANCELLED',
+}
