@@ -1,11 +1,33 @@
 "use client"
 
 import { useState, Suspense } from "react"
-import { signIn } from "next-auth/react"
+import { signIn, useSession } from "next-auth/react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { loginSchema, type LoginInput } from "@/lib/utils/validators"
+
+function getDashboardRouteByRole(role: string): string {
+  switch (role) {
+    case "SUPERADMIN":
+      return "/superadmin/dashboard"
+    case "ADMIN":
+      return "/admin/dashboard"
+    case "DIRECTOR_SALES":
+    case "SALES":
+      return "/sales/dashboard"
+    case "DIRECTOR_INSTALLATIONS":
+    case "TECHNICIAN":
+      return "/technician/dashboard"
+    case "DIRECTOR_MARKETING":
+    case "MARKETING":
+      return "/marketing/dashboard"
+    case "WAREHOUSE":
+      return "/warehouse/dashboard"
+    default:
+      return "/admin/dashboard"
+  }
+}
 
 // Forzar renderizado dinámico para evitar error de prerendering con useSearchParams
 export const dynamic = 'force-dynamic'
@@ -13,7 +35,7 @@ export const dynamic = 'force-dynamic'
 function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const callbackUrl = searchParams.get("callbackUrl") || "/dashboard"
+  const callbackUrl = searchParams.get("callbackUrl")
 
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -43,8 +65,19 @@ function LoginForm() {
         return
       }
 
+      // Obtener la sesión para determinar el rol y redirigir
+      const sessionResponse = await fetch("/api/auth/session")
+      const session = await sessionResponse.json()
+
+      let redirectUrl = callbackUrl
+      if (!redirectUrl && session?.user?.role) {
+        redirectUrl = getDashboardRouteByRole(session.user.role)
+      } else if (!redirectUrl) {
+        redirectUrl = "/admin/dashboard"
+      }
+
       // Redirigir después de login exitoso
-      router.push(callbackUrl)
+      router.push(redirectUrl)
       router.refresh()
     } catch (err) {
       setError("Ha ocurrido un error. Por favor, inténtalo de nuevo.")
