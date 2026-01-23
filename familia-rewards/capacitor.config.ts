@@ -3,9 +3,11 @@ import { CapacitorConfig } from '@capacitor/cli';
 const config: CapacitorConfig = {
   appId: 'com.familiarewards.app',
   appName: 'Familia Rewards',
-  webDir: 'out',
+  webDir: 'public',
   bundledWebRuntime: false,
   server: {
+    // En producción, apuntar a tu dominio desplegado
+    // url: 'https://tu-dominio.vercel.app',
     androidScheme: 'https',
     cleartext: true,
   },
