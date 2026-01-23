@@ -1,0 +1,59 @@
+# Dependencies
+node_modules
+.pnp
+.pnp.js
+
+# Testing
+coverage
+
+# Next.js
+.next/
+out/
+build
+dist
+
+# Production
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Env files
+.env
+.env*.local
+.env.production
+
+# Vercel
+.vercel
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Prisma
+prisma/migrations
+
+# Capacitor
+android/
+ios/
+.capacitor/
+
+# PWA
+public/sw.js
+public/workbox-*.js
+public/worker-*.js
+public/fallback-*.js
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Misc
+.turbo
