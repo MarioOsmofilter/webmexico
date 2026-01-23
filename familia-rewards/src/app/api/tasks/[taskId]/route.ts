@@ -6,7 +6,7 @@ import { db } from '@/lib/db';
 // PATCH - Completar o validar tarea
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { taskId: string } }
+  { params }: { params: Promise<{ taskId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -15,7 +15,7 @@ export async function PATCH(
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
-    const { taskId } = params;
+    const { taskId } = await params;
     const { action, reviewNote } = await req.json();
 
     const task = await db.task.findUnique({
@@ -156,7 +156,7 @@ export async function PATCH(
 // DELETE - Eliminar tarea (solo padres)
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { taskId: string } }
+  { params }: { params: Promise<{ taskId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -165,7 +165,7 @@ export async function DELETE(
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
-    const { taskId } = params;
+    const { taskId } = await params;
 
     const task = await db.task.findUnique({
       where: { id: taskId },
