@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Familia Rewards</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 24px;
+            padding: 40px;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+        .logo {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: bounce 2s infinite;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        h1 {
+            color: #1a202c;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        p {
+            color: #718096;
+            font-size: 16px;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        .status {
+            background: #f7fafc;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .status-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .status-item:last-child {
+            border-bottom: none;
+        }
+        .status-label {
+            color: #4a5568;
+            font-size: 14px;
+        }
+        .status-value {
+            color: #2d3748;
+            font-weight: 600;
+        }
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .badge-success {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+        .badge-warning {
+            background: #fef5e7;
+            color: #975a16;
+        }
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+            transition: transform 0.2s;
+        }
+        .btn:active {
+            transform: scale(0.95);
+        }
+        .info {
+            background: #edf2f7;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin-top: 20px;
+            text-align: left;
+            border-radius: 8px;
+        }
+        .info strong {
+            color: #2d3748;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .info ul {
+            margin-left: 20px;
+            color: #4a5568;
+            font-size: 14px;
+        }
+        .info li {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">🏆</div>
+        <h1>Familia Rewards</h1>
+        <p>Sistema de recompensas familiar con puntos y tareas</p>
+
+        <div class="status">
+            <div class="status-item">
+                <span class="status-label">APK compilado</span>
+                <span class="badge badge-success">✓ OK</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Versión</span>
+                <span class="status-value">1.0.0</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Plataforma</span>
+                <span class="status-value">Android</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Servidor Backend</span>
+                <span class="badge badge-warning">No conectado</span>
+            </div>
+        </div>
+
+        <button class="btn" onclick="alert('La app necesita estar conectada a un servidor backend.\n\nPasos:\n1. Despliega la app en Vercel\n2. Obtén la URL del deploy\n3. Configura Capacitor con esa URL\n4. Recompila el APK')">
+            📱 Configurar Servidor
+        </button>
+
+        <div class="info">
+            <strong>⚙️ Para que funcione completamente:</strong>
+            <ul>
+                <li>Despliega la app en <strong>Vercel</strong> o <strong>Railway</strong></li>
+                <li>Configura la URL en <code>capacitor.config.ts</code></li>
+                <li>Recompila el APK con la nueva configuración</li>
+            </ul>
+        </div>
+
+        <div class="info" style="margin-top: 15px; border-color: #f56565;">
+            <strong>🚀 Despliegue Rápido:</strong>
+            <ul>
+                <li>Ejecuta: <code>vercel</code> en la terminal</li>
+                <li>Copia la URL generada</li>
+                <li>Actualiza <code>server.url</code> en config</li>
+                <li>Ejecuta: <code>npm run android:build</code></li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Detectar si está en Capacitor
+        if (window.Capacitor) {
+            console.log('Running inside Capacitor');
+            console.log('Platform:', window.Capacitor.getPlatform());
+        }
+    </script>
+</body>
+</html>
