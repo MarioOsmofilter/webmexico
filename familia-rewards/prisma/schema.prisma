@@ -1,0 +1,441 @@
+// Prisma Schema para Familia Rewards
+// Database: Neon PostgreSQL (Serverless)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ============================================
+// AUTENTICACIÓN Y USUARIOS
+// ============================================
+
+enum UserRole {
+  PARENT  // Padre/Madre - Admin completo
+  CHILD   // Hijo/Hija - Usuario limitado
+  COUPLE  // Pareja - Peer level
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  emailVerified DateTime?
+  name          String?
+  image         String?
+  password      String? // Para auth con email/password
+  role          UserRole  @default(PARENT)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relaciones NextAuth
+  accounts Account[]
+  sessions Session[]
+
+  // Perfil de padre
+  parentProfile   ParentProfile?
+  childrenManaged Child[]        @relation("ParentChildren")
+
+  // Perfil de hijo
+  childProfile Child? @relation("ChildUser")
+
+  // Perfil de pareja
+  coupleProfileA CoupleProfile? @relation("CoupleUserA")
+  coupleProfileB CoupleProfile? @relation("CoupleUserB")
+
+  // Notificaciones enviadas
+  notificationsSent Notification[] @relation("NotificationSender")
+
+  @@index([email])
+  @@map("users")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+// ============================================
+// PERFILES
+// ============================================
+
+model ParentProfile {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Configuración
+  notificationsEnabled Boolean @default(true)
+  weeklyReportEnabled  Boolean @default(true)
+
+  @@map("parent_profiles")
+}
+
+model Child {
+  id        String   @id @default(cuid())
+  userId    String?  @unique // Null si aún no tiene cuenta de usuario
+  user      User?    @relation("ChildUser", fields: [userId], references: [id], onDelete: SetNull)
+  parentId  String
+  parent    User     @relation("ParentChildren", fields: [parentId], references: [id], onDelete: Cascade)
+  name      String
+  age       Int
+  avatar    String? // URL o emoji
+  color     String   @default("#3b82f6") // Color para identificar al hijo
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Puntos actuales
+  totalPoints    Int      @default(0)
+  lifetimePoints Int      @default(0) // Puntos históricos totales
+  streak         Int      @default(0) // Días seguidos completando tareas
+  lastStreakDate DateTime @default(now())
+
+  // Relaciones
+  tasks           Task[]
+  pointsHistory   PointTransaction[]
+  rewards         RewardRedemption[]
+  badges          ChildBadge[]
+  notifications   Notification[]
+  punishmentState PunishmentState?
+
+  @@index([parentId])
+  @@index([userId])
+  @@map("children")
+}
+
+// ============================================
+// MÓDULO PAREJA
+// ============================================
+
+model CoupleProfile {
+  id        String   @id @default(cuid())
+  userAId   String   @unique
+  userBId   String   @unique
+  userA     User     @relation("CoupleUserA", fields: [userAId], references: [id], onDelete: Cascade)
+  userB     User     @relation("CoupleUserB", fields: [userBId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Puntos de cada uno
+  pointsUserA Int @default(0)
+  pointsUserB Int @default(0)
+
+  // Relaciones
+  coupleTasks    CoupleTask[]
+  coupleRewards  CoupleReward[]
+  pointsHistory  CouplePointTransaction[]
+  rewardRedemptions CoupleRewardRedemption[]
+
+  @@map("couple_profiles")
+}
+
+model CoupleTask {
+  id        String   @id @default(cuid())
+  coupleId  String
+  couple    CoupleProfile @relation(fields: [coupleId], references: [id], onDelete: Cascade)
+  title     String
+  description String?
+  points    Int
+  assignedTo String // "userA" | "userB" | "both"
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([coupleId])
+  @@map("couple_tasks")
+}
+
+model CoupleReward {
+  id          String   @id @default(cuid())
+  coupleId    String
+  couple      CoupleProfile @relation(fields: [coupleId], references: [id], onDelete: Cascade)
+  title       String
+  description String?
+  pointsCost  Int
+  icon        String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  redemptions CoupleRewardRedemption[]
+
+  @@index([coupleId])
+  @@map("couple_rewards")
+}
+
+model CouplePointTransaction {
+  id        String   @id @default(cuid())
+  coupleId  String
+  couple    CoupleProfile @relation(fields: [coupleId], references: [id], onDelete: Cascade)
+  userType  String // "userA" | "userB"
+  points    Int // Positivo o negativo
+  reason    String
+  createdAt DateTime @default(now())
+
+  @@index([coupleId])
+  @@index([createdAt])
+  @@map("couple_point_transactions")
+}
+
+model CoupleRewardRedemption {
+  id        String   @id @default(cuid())
+  coupleId  String
+  couple    CoupleProfile @relation(fields: [coupleId], references: [id], onDelete: Cascade)
+  rewardId  String
+  reward    CoupleReward @relation(fields: [rewardId], references: [id], onDelete: Cascade)
+  userType  String // "userA" | "userB"
+  redeemedAt DateTime @default(now())
+
+  @@index([coupleId])
+  @@index([rewardId])
+  @@map("couple_reward_redemptions")
+}
+
+// ============================================
+// TAREAS Y PUNTOS (MÓDULO HIJO)
+// ============================================
+
+enum TaskStatus {
+  PENDING      // Pendiente de hacer
+  COMPLETED    // Completada por el hijo, esperando validación
+  APPROVED     // Aprobada por padre
+  REJECTED     // Rechazada por padre
+}
+
+enum TaskFrequency {
+  ONCE       // Una vez
+  DAILY      // Diaria
+  WEEKLY     // Semanal
+  MONTHLY    // Mensual
+}
+
+model Task {
+  id          String        @id @default(cuid())
+  childId     String
+  child       Child         @relation(fields: [childId], references: [id], onDelete: Cascade)
+  title       String
+  description String?
+  points      Int
+  frequency   TaskFrequency @default(ONCE)
+  status      TaskStatus    @default(PENDING)
+  dueDate     DateTime?
+  completedAt DateTime?
+  reviewedAt  DateTime?
+  reviewNote  String? // Comentario del padre al aprobar/rechazar
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  // Para tareas recurrentes
+  isRecurring Boolean @default(false)
+  recurringRule String? // JSON con configuración (días de la semana, etc.)
+
+  @@index([childId])
+  @@index([status])
+  @@index([dueDate])
+  @@map("tasks")
+}
+
+model PointTransaction {
+  id        String   @id @default(cuid())
+  childId   String
+  child     Child    @relation(fields: [childId], references: [id], onDelete: Cascade)
+  points    Int // Positivo o negativo
+  reason    String
+  taskId    String? // Si está relacionado con una tarea
+  createdAt DateTime @default(now())
+
+  @@index([childId])
+  @@index([createdAt])
+  @@map("point_transactions")
+}
+
+// ============================================
+// RECOMPENSAS Y CANJES
+// ============================================
+
+enum RewardCategory {
+  SCREEN_TIME  // Tiempo de pantalla
+  FOOD         // Comida favorita
+  ACTIVITY     // Actividad/salida
+  TOY          // Juguete/regalo
+  PRIVILEGE    // Privilegio especial
+  CUSTOM       // Personalizado
+}
+
+model Reward {
+  id          String         @id @default(cuid())
+  parentId    String // Padre que creó la recompensa
+  title       String
+  description String?
+  pointsCost  Int
+  category    RewardCategory @default(CUSTOM)
+  icon        String? // Emoji o URL de imagen
+  isActive    Boolean        @default(true)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  redemptions RewardRedemption[]
+
+  @@index([parentId])
+  @@index([isActive])
+  @@map("rewards")
+}
+
+model RewardRedemption {
+  id         String   @id @default(cuid())
+  childId    String
+  child      Child    @relation(fields: [childId], references: [id], onDelete: Cascade)
+  rewardId   String
+  reward     Reward   @relation(fields: [rewardId], references: [id], onDelete: Cascade)
+  pointsUsed Int
+  redeemedAt DateTime @default(now())
+  usedAt     DateTime? // Cuando se usó efectivamente la recompensa
+  isUsed     Boolean  @default(false)
+
+  @@index([childId])
+  @@index([rewardId])
+  @@map("reward_redemptions")
+}
+
+// ============================================
+// GAMIFICACIÓN
+// ============================================
+
+enum BadgeType {
+  FIRST_TASK      // Primera tarea completada
+  WEEK_STREAK     // Racha de 7 días
+  MONTH_STREAK    // Racha de 30 días
+  POINTS_100      // 100 puntos acumulados
+  POINTS_500      // 500 puntos acumulados
+  POINTS_1000     // 1000 puntos acumulados
+  PERFECT_WEEK    // Semana perfecta (todas las tareas)
+  EARLY_BIRD      // Completar tareas temprano
+  HELPING_HAND    // Ayudar sin que se pida
+  CUSTOM          // Badge personalizado
+}
+
+model Badge {
+  id          String    @id @default(cuid())
+  type        BadgeType
+  name        String
+  description String
+  icon        String
+  requirement String // Descripción del requisito
+  createdAt   DateTime  @default(now())
+
+  children ChildBadge[]
+
+  @@map("badges")
+}
+
+model ChildBadge {
+  id        String   @id @default(cuid())
+  childId   String
+  child     Child    @relation(fields: [childId], references: [id], onDelete: Cascade)
+  badgeId   String
+  badge     Badge    @relation(fields: [badgeId], references: [id], onDelete: Cascade)
+  earnedAt  DateTime @default(now())
+
+  @@unique([childId, badgeId])
+  @@index([childId])
+  @@map("child_badges")
+}
+
+// ============================================
+// NOTIFICACIONES Y CONTROL PARENTAL
+// ============================================
+
+enum NotificationType {
+  TASK_ASSIGNED       // Tarea asignada
+  TASK_COMPLETED      // Tarea completada (para padre)
+  TASK_APPROVED       // Tarea aprobada (para hijo)
+  TASK_REJECTED       // Tarea rechazada (para hijo)
+  REWARD_REDEEMED     // Recompensa canjeada
+  BADGE_EARNED        // Badge ganado
+  REMINDER            // Recordatorio de tarea
+  PUNISHMENT_ACTIVE   // Castigo activado
+  PUNISHMENT_REMINDER // Recordatorio molesto de castigo
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  childId   String?
+  child     Child?           @relation(fields: [childId], references: [id], onDelete: Cascade)
+  senderId  String?
+  sender    User?            @relation("NotificationSender", fields: [senderId], references: [id], onDelete: SetNull)
+  type      NotificationType
+  title     String
+  message   String
+  isRead    Boolean          @default(false)
+  createdAt DateTime         @default(now())
+
+  // Para notificaciones push
+  sentToPush Boolean @default(false)
+
+  @@index([childId])
+  @@index([isRead])
+  @@index([createdAt])
+  @@map("notifications")
+}
+
+// ============================================
+// SISTEMA DE CASTIGO (NOTIFICACIONES MOLESTAS)
+// ============================================
+
+model PunishmentState {
+  id        String   @id @default(cuid())
+  childId   String   @unique
+  child     Child    @relation(fields: [childId], references: [id], onDelete: Cascade)
+  isActive  Boolean  @default(false)
+  reason    String?
+  startedAt DateTime @default(now())
+  endAt     DateTime? // Null = indefinido
+
+  // Configuración de las notificaciones molestas
+  intervalSeconds Int @default(30) // Cada cuántos segundos enviar notificación
+  soundEnabled    Boolean @default(true)
+  vibrationEnabled Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("punishment_states")
+}
