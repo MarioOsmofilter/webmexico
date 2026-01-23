@@ -12,7 +12,7 @@
     "db:push": "prisma db push",
     "db:studio": "prisma studio",
     "db:migrate": "prisma migrate dev",
-    "postinstall": "prisma generate",
+    "postinstall": "prisma generate || true",
     "cap:sync": "cap sync",
     "cap:open:android": "cap open android",
     "android:build": "npm run build && cap sync && cd android && ./gradlew assembleDebug",
