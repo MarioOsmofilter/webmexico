@@ -8,7 +8,6 @@ const withPWA = require('next-pwa')({
 
 const nextConfig = {
   reactStrictMode: true,
-  swcMinify: true,
   images: {
     domains: ['localhost', 'lh3.googleusercontent.com'],
     unoptimized: true,
